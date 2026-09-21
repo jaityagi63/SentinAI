@@ -199,7 +199,7 @@ def test_client_backoff_and_rate_limits(monkeypatch):
         return httpx.Response(200, headers={"x-rate-limit-remaining": "299", "x-rate-limit-reset": str(int(time.time()) + 900)}, json=page)
 
     client = XClient(bearer_token="test", base_url="https://api.x.com/2", transport=httpx.MockTransport(handler), sleep=sleeps.append)
-    posts = list(client.search("muslims", max_pages=3))
+    posts = list(client.search("muslims", max_pages=3, full_archive=True))
     assert len(posts) == 4  # two pages
     assert calls["n"] == 4  # 429, 503, page1, page2
     assert len(sleeps) == 2 and sleeps[0] >= 1

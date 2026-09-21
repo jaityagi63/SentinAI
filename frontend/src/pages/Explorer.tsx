@@ -157,6 +157,7 @@ export default function ExplorerPage() {
                       <div className="muted" style={{ fontSize: 11, marginTop: 3 }}>
                         @{p.author_username} {p.bot_probability !== null && p.bot_probability >= 0.8 && <span className="badge bot">bot</span>} · {p.language ?? p.lang}
                         {p.has_media && " · 🖼 media"}
+                        {p.source && p.source !== "demo" && <span className="badge muted" style={{ marginLeft: 6 }} title="provenance">{p.source === "x" ? "live X" : p.source}</span>}
                         {p.needs_review && <span className="badge muted" style={{ marginLeft: 6 }}>needs review</span>}
                       </div>
                     </td>

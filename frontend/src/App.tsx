@@ -14,6 +14,7 @@ import AccountsPage from "./pages/Accounts";
 import ReviewPage from "./pages/Review";
 import FairnessPage from "./pages/Fairness";
 import ClassifyPage from "./pages/Classify";
+import IngestPage from "./pages/Ingest";
 
 const NAV = [
   { to: "/", icon: "◎", label: "Overview", perm: "read" },
@@ -25,6 +26,7 @@ const NAV = [
   { to: "/bots", icon: "⚙", label: "Bots vs humans", perm: "read" },
   { to: "/accounts", icon: "◉", label: "Account scores", perm: "read" },
   { to: "/classify", icon: "⌕", label: "Classify text", perm: "read" },
+  { to: "/ingest", icon: "⇣", label: "Ingest from X", perm: "ingest" },
   { to: "/review", icon: "✎", label: "Human review", perm: "review" },
   { to: "/fairness", icon: "⚖", label: "Fairness audit", perm: "audit" },
 ];
@@ -77,6 +79,7 @@ function Shell({ session, onLogout }: { session: Session; onLogout: () => void }
           <Route path="/accounts" element={<AccountsPage />} />
           <Route path="/accounts/:id" element={<AccountsPage />} />
           <Route path="/classify" element={<ClassifyPage />} />
+          <Route path="/ingest" element={can("ingest") ? <IngestPage /> : <Navigate to="/" />} />
           <Route path="/review" element={can("review") ? <ReviewPage /> : <Navigate to="/" />} />
           <Route path="/fairness" element={can("audit") ? <FairnessPage /> : <Navigate to="/" />} />
           <Route path="*" element={<Navigate to="/" />} />

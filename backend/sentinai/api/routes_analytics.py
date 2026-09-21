@@ -43,9 +43,11 @@ def overview(days: int = Query(90, ge=1, le=3650), exclude_bots: bool = False, u
     authors = session.scalar(select(func.count(func.distinct(PostRow.author_id))).where(PostRow.created_at >= since)) or 0
     bot_authors = session.scalar(select(func.count()).select_from(AuthorRow).where(AuthorRow.bot_probability >= 0.8)) or 0
     avg_sev = session.scalar(select(func.avg(sub.c.severity_level)).where(sub.c.final_toxicity >= 0.5)) or 0.0
+    by_source = dict(session.execute(select(PostRow.source, func.count()).where(PostRow.created_at >= since, PostRow.deleted_upstream.is_(False)).group_by(PostRow.source)).all())
     return {
         "days": days,
         "posts": total,
+        "by_source": {(k or "x"): int(v) for k, v in by_source.items()},
         "toxic_posts": toxic,
         "toxic_ratio": round(toxic / total, 4) if total else 0.0,
         "avg_severity_toxic": round(float(avg_sev), 3),

@@ -111,6 +111,7 @@ export async function downloadFile(path: string, filename: string) {
 export interface Overview {
   days: number;
   posts: number;
+  by_source?: Record<string, number>;
   toxic_posts: number;
   toxic_ratio: number;
   avg_severity_toxic: number;
@@ -244,6 +245,7 @@ export interface PostSummary {
   engagement: { likes: number; retweets: number; replies: number; quotes: number };
   has_media: boolean;
   media: { media_key: string; type: string; alt_text?: string | null }[] | null;
+  source?: string;
   toxicity_label?: string;
   toxicity_confidence?: number;
   final_toxicity?: number;
@@ -337,4 +339,78 @@ export interface FairnessReport {
   groups: FairnessGroup[];
   calibrated_thresholds: Record<string, number>;
   notes: string[];
+}
+
+// ---------------------------------------------------------------------------------------------
+// ingestion (Module 1 — live X + imports)
+// ---------------------------------------------------------------------------------------------
+
+export interface IngestReport {
+  kind: string;
+  query: string | null;
+  fetched: number;
+  ingested: number;
+  hydrated_parents: number;
+  media_downloaded: number;
+  endpoint: string | null;
+  since_id: string | null;
+  newest_id: string | null;
+  toxic: number;
+  by_label: Record<string, number>;
+  post_ids: string[];
+  warnings: string[];
+  rate_limits: Record<string, { remaining: number | null; limit: number | null; reset_at: string | null }>;
+  duration_seconds: number;
+}
+
+export interface IngestJob {
+  id: string;
+  kind: string;
+  label: string;
+  owner: string;
+  params: Record<string, unknown>;
+  status: "queued" | "running" | "done" | "failed" | "cancelled";
+  created_at: string;
+  started_at: string | null;
+  finished_at: string | null;
+  progress: Record<string, number>;
+  report: IngestReport | null;
+  error: string | null;
+}
+
+export interface IngestResponse {
+  job: IngestJob | null;
+  report: IngestReport | null;
+}
+
+export interface IngestStatus {
+  token: { configured: boolean; source: string | null; hint: string | null };
+  api_base: string;
+  full_archive_default: boolean;
+  download_media_default: boolean;
+  max_wait_seconds: number;
+  upload_max_mb: number;
+  posts_by_source: Record<string, number>;
+  cursors: { query: string; since_id: string | null; last_run: string | null; total_ingested: number }[];
+  active_jobs: IngestJob[];
+  stream_running: boolean;
+  endpoints: Record<string, string>;
+}
+
+export interface XConnectionTest {
+  ok: boolean;
+  recent_search?: boolean;
+  full_archive?: boolean | null;
+  sample_posts?: number;
+  latency_ms?: number;
+  status?: number;
+  error?: string;
+  rate_limits: Record<string, { remaining: number | null; limit: number | null; reset_at: string | null }>;
+}
+
+export async function uploadFile<T>(path: string, file: File, fields: Record<string, string> = {}): Promise<T> {
+  const form = new FormData();
+  form.append("file", file);
+  for (const [k, v] of Object.entries(fields)) form.append(k, v);
+  return api<T>(path, { method: "POST", body: form });
 }

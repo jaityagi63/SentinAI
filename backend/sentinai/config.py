@@ -38,6 +38,19 @@ class Settings(BaseSettings):
     x_max_retries: int = 6
     x_backoff_base_seconds: float = 2.0
     x_backoff_max_seconds: float = 900.0
+    # Search endpoint: ``/tweets/search/recent`` (7-day window, available on every paid /
+    # pay-per-use plan) is the default; ``/tweets/search/all`` needs full-archive access and is
+    # used only when this flag is on (the client falls back to recent search on 402/403).
+    x_full_archive: bool = False
+    x_default_max_pages: int = 5
+    # Interactive (dashboard-triggered) jobs never block longer than this on a rate limit; they
+    # return the posts fetched so far plus the reset time instead.
+    x_api_max_wait_seconds: float = 45.0
+    # Download photo attachments to ``data/media`` so the OCR / CLIP / symbol detectors can run
+    # on real images (Module 5).  Off by default: it costs bandwidth and disk.
+    x_download_media: bool = False
+    # Upper bound for bulk file uploads through the API.
+    ingest_upload_max_mb: int = 50
     # Compliance: retention window for raw payloads (GDPR/CCPA data minimisation).
     retention_days: int = 90
     # Compliance: how often the compliance stream / deleted-post sweep should run.

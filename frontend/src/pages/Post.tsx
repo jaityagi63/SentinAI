@@ -168,6 +168,15 @@ export default function PostPage() {
           )}
           {" · "}
           <Link to={`/accounts/${data.author_id}`}>account score</Link>
+          {data.source && data.source !== "demo" && /^\d+$/.test(data.id) && (
+            <>
+              {" · "}
+              <a href={`https://x.com/i/web/status/${data.id}`} target="_blank" rel="noreferrer">
+                open on X ↗
+              </a>
+            </>
+          )}
+          {data.source === "demo" && <> · synthetic demo post</>}
         </div>
         {c?.explanation && (
           <div className="grid cols-2" style={{ marginTop: 12 }}>

@@ -42,8 +42,15 @@ export default function OverviewPage() {
 
   if (!ov.data) return <Loading error={ov.error} />;
   const o = ov.data;
+  const realPosts = Object.entries(o.by_source ?? {}).reduce((acc, [k, v]) => (k === "demo" ? acc : acc + v), 0);
+  const demoOnly = o.posts > 0 && realPosts === 0 && (o.by_source?.demo ?? 0) > 0;
   return (
     <>
+      {demoOnly && (
+        <div className="alert info" style={{ marginBottom: 16 }}>
+          You are looking at the <b>synthetic demo corpus</b>. Connect an X API token under <Link to="/ingest">Ingest from X</Link> to analyse real posts — by search query, tweet URL, user timeline, live stream or file import.
+        </div>
+      )}
       <div className="page-head">
         <div>
           <h1>Overview</h1>

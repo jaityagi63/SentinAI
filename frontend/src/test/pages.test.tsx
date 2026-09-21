@@ -21,6 +21,7 @@ import AccountsPage from "../pages/Accounts";
 import ReviewPage from "../pages/Review";
 import FairnessPage from "../pages/Fairness";
 import ClassifyPage from "../pages/Classify";
+import IngestPage from "../pages/Ingest";
 
 const live = await backendAvailable();
 const d = live ? describe : describe.skip;
@@ -196,6 +197,20 @@ d("dashboard pages (live backend)", () => {
     expect(screen.getByText(/L4 · Incitement/)).toBeTruthy();
     expect(document.querySelectorAll(".heat-token").length).toBeGreaterThan(0);
     expect(screen.getByText(/leetspeak/)).toBeTruthy();
+    noError();
+  });
+
+  it("ingest page shows connection state, imports a CSV and reports the result", async () => {
+    renderAt("/ingest", <Route path="/ingest" element={<IngestPage />} />);
+    expect(await screen.findByText("Corpus by source", {}, { timeout: 15000 })).toBeTruthy();
+    expect(await screen.findByText(/real posts/)).toBeTruthy();
+    fireEvent.click(screen.getByText("Upload file"));
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const csv = new File(["id,text,created_at,username\n880001,\"these dirty Asians need to go back to China\",2026-09-10T08:00:00Z,vitest_user\n"], "posts.csv", { type: "text/csv" });
+    Object.defineProperty(input, "files", { value: [csv] });
+    fireEvent.click(screen.getByText("Import & classify"));
+    expect(await screen.findByText("classified & stored", {}, { timeout: 30000 })).toBeTruthy();
+    expect(screen.getByText("hate speech")).toBeTruthy();
     noError();
   });
 });
