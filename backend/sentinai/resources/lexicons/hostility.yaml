@@ -1,0 +1,272 @@
+# Hostility pattern lexicon for the heuristic classification backend and for evidence
+# extraction / explainability in the transformer backend.
+#
+# Each pattern is a Python regex applied to the *normalized* text (lower-cased, de-obfuscated,
+# emoji demojized, hashtags split).  The placeholder {G} is replaced at compile time with an
+# alternation of every group term from targets.yaml (plus slurs), so a pattern such as
+# "kill all {G}" matches "kill all <group>" for any known target.  Patterns without {G} are
+# generic hostility cues that are still scored, but produce a *target* only if a group term
+# is found nearby in the same post.
+#
+# weight: contribution to the category score (0-1).  Severity level per category:
+#   stereotype=1, dehumanization=2, harassment=3, incitement=4.
+#
+# Languages: en, es, fr, pt, de, hi (romanized + Devanagari), ar (script + Arabizi).
+
+stereotype:
+  - { pattern: "\\b(all|every single|typical|those|these) {G}\\b", weight: 0.45 }
+  - { pattern: "\\b{G} (are|r|is) (all|always|never|so|naturally|inherently|just|basically|genetically) \\w+", weight: 0.55 }
+  - { pattern: "\\b{G} (are|r|is) (all )?(good|bad|great|terrible) at\\b", weight: 0.55 }
+  - { pattern: "\\b(they|they're|theyre|they are|those people|these people|you people) ?(are|r|'re)? ?(all|always|never) (good|bad|great) at\\b", weight: 0.5 }
+  - { pattern: "\\bthey'?re all (good|bad|great|terrible) at\\b", weight: 0.5 }
+  - { pattern: "\\b(you people|your kind|your people|those people|these people)\\b", weight: 0.35 }
+  - { pattern: "\\bwhat (do you|can you|else would you) expect from {G}\\b", weight: 0.6 }
+  - { pattern: "\\bof course (it was|it's|its|they were) {G}\\b", weight: 0.55 }
+  - { pattern: "\\b{G} (can'?t|cannot|can not) be trusted\\b", weight: 0.65 }
+  - { pattern: "\\b{G} (are|is|r) (known|famous|notorious) for\\b", weight: 0.5 }
+  - { pattern: "\\b{G} (are|r|is) (all )?(lazy|greedy|cheap|stingy|criminals?|thieves|violent|dirty|smelly|stupid|dumb|sneaky|liars|terrorists?|rapists?|backwards?|primitive|uncivili[sz]ed|savage|dishonest|untrustworthy)\\b", weight: 0.8 }
+  - { pattern: "\\bthey('?re| are) all (lazy|greedy|cheap|criminals?|thieves|violent|dirty|smelly|stupid|dumb|sneaky|liars|terrorists?|rapists?|backwards?|primitive|uncivili[sz]ed|the same)\\b", weight: 0.7 }
+  - { pattern: "\\b(not surprised|no surprise|unsurprising|as usual|as always)[^.]{0,30}{G}\\b", weight: 0.4 }
+  - { pattern: "\\b{G} (always|never) \\w+", weight: 0.35 }
+  - { pattern: "\\b(they|they're|theyre|these people|those people|you people|them|{G}) ?(are|r|'re|is)? ?(all|literally all|basically all|mostly|obviously|clearly) (terrorists?|criminals?|thieves|thiefs|rapists?|liars|frauds?|cheats?|scammers?|leeches|parasites|the same|like that|alike|crooks?|drug dealers?|gang ?members?|welfare (queens|cheats|leeches)|freeloaders?)\\b", weight: 0.8 }
+  - { pattern: "\\b(every|each|every single) (one|last one) of (them|these|those|the) ?{G}? (is|are) (a |an )?(thief|criminal|terrorist|rapist|liar|fraud|cheat|scammer|leech|parasite|crook|drug dealer|gang member|freeloader|savage|animal)\\b", weight: 0.85 }
+  - { pattern: "\\b{G} (control|controls|own|owns|run|runs) (everything|the (media|banks|world|government|economy|country|news|hollywood|money))\\b", weight: 0.85 }
+  - { pattern: "\\b(don'?t|dont|do not|never|won'?t|wont|can'?t|cant|ion|i don'?t) trust (a single |any |none of |any of |them |those |these )?{G}\\b", weight: 0.7 }
+  - { pattern: "\\b(ion|i don'?t|dont|never) trust none of (them|those|these|the) {G}\\b", weight: 0.7 }
+  - { pattern: "\\b(taking over|took over|take over|are taking over|have taken over) (the |our |this |my )?(whole |entire )?(town|city|country|neighbou?rhood|street|streets|schools?|place|area|block|nation|west|europe|america|britain)\\b", weight: 0.6 }
+  # es
+  - { pattern: "\\b(todos los|todas las|típic[oa]s?) {G}\\b", weight: 0.45 }
+  - { pattern: "\\b{G} son (todos |todas )?(vagos|ladrones|sucios|delincuentes|criminales|violentos|tontos|mentirosos|terroristas)\\b", weight: 0.8 }
+  # fr
+  - { pattern: "\\b(tous les|toutes les|typique) {G}\\b", weight: 0.45 }
+  - { pattern: "\\b{G} sont (tous |toutes )?(paresseux|voleurs|sales|criminels|violents|bêtes|menteurs|terroristes)\\b", weight: 0.8 }
+  # pt
+  - { pattern: "\\b(todos os|todas as|típic[oa]s?) {G}\\b", weight: 0.45 }
+  - { pattern: "\\b{G} são (todos |todas )?(preguiçosos|ladrões|sujos|bandidos|criminosos|violentos|burros|mentirosos|terroristas)\\b", weight: 0.8 }
+  # de
+  - { pattern: "\\b(alle|typische?) {G}\\b", weight: 0.45 }
+  - { pattern: "\\b{G} sind (alle )?(faul|diebe|dreckig|kriminell|kriminelle|gewalttätig|dumm|lügner|terroristen)\\b", weight: 0.8 }
+  # hi (romanized + script)
+  - { pattern: "\\b(saare|sare|sab|sabhi|ye sab|yeh sab) {G}\\b", weight: 0.45 }
+  - { pattern: "\\b{G} (sab|saare|sare)? ?(chor|gande|ganda|jhoothe|jhoote|kamine|aatankwadi|atankwadi|gaddar|deshdrohi) (hain|hai|hote hain)\\b", weight: 0.8 }
+  - { pattern: "(सारे|सब|सभी|ये सब) {G}", weight: 0.45 }
+  - { pattern: "{G} (सब |सारे )?(चोर|गंदे|झूठे|कमीने|आतंकवादी|गद्दार|देशद्रोही) (हैं|होते हैं)", weight: 0.8 }
+  # ar
+  - { pattern: "(كل|جميع) {G}", weight: 0.45 }
+  - { pattern: "{G} (كلهم |كلها )?(كذابين|حرامية|أوسخ|وسخين|إرهابيين|ارهابيين|متخلفين|همج)", weight: 0.8 }
+  - { pattern: "\\b(kol|kul|kull) {G}\\b", weight: 0.45 }
+
+dehumanization:
+  # exclusion
+  - { pattern: "\\b(don'?t|do not|doesn'?t|does not) belong (here|in (this|our|my) country)\\b", weight: 0.75 }
+  - { pattern: "\\bgo back to (where|your|the|africa|asia|mexico|china|india|pakistan|syria|the middle east)\\b", weight: 0.8 }
+  - { pattern: "\\bget (out|the hell out) of (our|my|this) country\\b", weight: 0.8 }
+  - { pattern: "\\b(are|r|is) not welcome (here|in)\\b", weight: 0.65 }
+  - { pattern: "\\b(send|ship|kick) (them|em|'em|{G}) (all )?(back|out|home)\\b", weight: 0.8 }
+  - { pattern: "\\bdeport (them|em|'em|all of them|every (one|single one)|the {G}|{G}) ?(all)?\\b", weight: 0.75 }
+  - { pattern: "\\bmass deportations?\\b", weight: 0.45 }
+  - { pattern: "\\b(ban|bar|block) (all )?{G}\\b", weight: 0.6 }
+  - { pattern: "\\bno more {G}\\b", weight: 0.55 }
+  - { pattern: "\\b(taking|take|steal|stealing|took) our (jobs|country|women|homes|benefits)\\b", weight: 0.6 }
+  - { pattern: "\\b(replace|replacing|replaced) us\\b", weight: 0.6 }
+  - { pattern: "\\bgreat replacement\\b", weight: 0.75 }
+  - { pattern: "\\bwhite genocide\\b", weight: 0.75 }
+  - { pattern: "\\b(invasion|invaders|invading|infestation|infest(ed|ing)?|swarm(ing|s)?|flood(ing)? (our|the) (country|border|streets|cities)|horde|hordes)\\b", weight: 0.7 }
+  - { pattern: "\\b(breed|breeding|multiply) like (rats|rabbits|roaches|cockroaches|animals)\\b", weight: 0.85 }
+  # dehumanizing metaphors
+  - { pattern: "\\b(vermin|cockroach(es)?|roaches|parasites?|leeches|rats|animals|beasts|savages?|subhumans?|sub-humans?|untermensch(en)?|mongrels?|apes?|monkeys?|dogs|pigs|swine|filth|scum of the earth|plague|disease|cancer|virus|garbage|trash of|degenerates?|barbarians?)\\b", weight: 0.65 }
+  - { pattern: "\\b(are|r|is|like) (nothing but |just |literally |basically )?(animals|vermin|cockroaches|roaches|parasites|rats|subhuman|sub-human|savages|beasts|a (plague|disease|cancer|virus))\\b", weight: 0.9 }
+  - { pattern: "\\b(not|aren'?t|ain'?t|are not) (even )?(human|people)\\b", weight: 0.85 }
+  - { pattern: "\\b(less than|lower than) human\\b", weight: 0.85 }
+  - { pattern: "\\binferior (race|people|culture|religion)\\b", weight: 0.85 }
+  - { pattern: "\\b(should|shouldn'?t|must|need to) be (allowed|banned|segregated|separated|sterili[sz]ed|removed|purged|kept out)\\b", weight: 0.7 }
+  - { pattern: "\\bkeep (them|{G}) out\\b", weight: 0.6 }
+  - { pattern: "\\b(ruin(ed|ing)?|destroy(ed|ing)?) (our|this) (country|city|neighbou?rhood|culture|nation)\\b", weight: 0.55 }
+  - { pattern: "\\b(don'?t|do not) (deserve|have) (any )?rights\\b", weight: 0.75 }
+  - { pattern: "\\b(run|drive|chase|push|force|throw|kick|get|clear|flush|smoke) (them|em|'em|{G}|(every|each) (one|last one|single one) of (them|these|those|the) ?{G}?|all (of )?(them|these|those|the) ?{G}?) (all )?(out|off|away|out of|off of|outta) (the |our |this |my )?(neighbou?rhood|town|city|country|state|streets?|block|area|schools?|here|britain|america|europe|germany|france|spain|india|our land|our streets)\\b", weight: 0.8 }
+  - { pattern: "\\b(get|throw|kick|keep|drive|run|force|chase|push) (them|em|'em|{G}) (all )?(out|off|away|out of here|outta here|out of (our|this|my) (country|town|city|neighbou?rhood|land|schools?))\\b", weight: 0.75 }
+  - { pattern: "\\b(need|needs|have|has|ought|got|gotta|must|should) (to )?be (dealt with|taken care of|handled|removed|gotten rid of|cleared out|cleaned out|wiped out|put in their place|taught a lesson|stopped|shipped out|shipped back|sent back|thrown out|kicked out|rounded up|locked up|put down|exterminated|eliminated)( once and for all| for good| permanently)?\\b", weight: 0.75 }
+  - { pattern: "\\b(get rid of|be rid of|rid (us|ourselves|the country|this country|our country) of|purge|cleanse|remove|eliminate|expel|evict|banish|exile) (all |every |the |these |those |them |every single |all of |all the )?(of )?(the )?{G}\\b", weight: 0.8 }
+  - { pattern: "\\b(zero|no) {G} (should be |should ever be |allowed |permitted )?(in|allowed in|permitted in|welcome in|inside|near|around) (our|this|my|the) (country|town|city|schools?|neighbou?rhood|borders?|state|nation)\\b", weight: 0.75 }
+  - { pattern: "\\b(not|never) (one|a single|another) (more )?{G} (in|inside|near|allowed in|should be in) (our|this|my|the) (country|town|city|schools?|neighbou?rhood|borders?|state|nation)\\b", weight: 0.75 }
+  # es
+  - { pattern: "\\b(fuera|largo|váyanse|vayanse|que se vayan|regresen|vuelvan) (de aquí|de mi país|de nuestro país|a su país|a su tierra)?\\b", weight: 0.6 }
+  - { pattern: "\\bno pertenecen (aquí|a este país)\\b", weight: 0.75 }
+  - { pattern: "\\b(son|parecen) (unos |unas )?(animales|ratas|cucarachas|parásitos|salvajes|plaga|basura|escoria)\\b", weight: 0.85 }
+  - { pattern: "\\b(invasión|invasores|invaden|infestan)\\b", weight: 0.65 }
+  - { pattern: "\\bdeport(en|ar|arlos|arlas)( a)? (todos|todas)?\\b", weight: 0.75 }
+  # fr
+  - { pattern: "\\b(rentrez|retournez|qu'ils rentrent|qu'ils retournent) chez (vous|eux)\\b", weight: 0.75 }
+  - { pattern: "\\b(n'?ont|n'?a) (rien à faire|pas leur place) (ici|en france|chez nous)\\b", weight: 0.75 }
+  - { pattern: "\\b(ce sont|sont) (des |de la )?(animaux|rats|cafards|parasites|sauvages|vermine|racaille)\\b", weight: 0.85 }
+  - { pattern: "\\b(invasion|envahisseurs|envahissent|grand remplacement)\\b", weight: 0.7 }
+  # pt
+  - { pattern: "\\b(voltem|volta|vão embora|vao embora|fora) (para|pro|pra) (o )?(seu|teu) país\\b", weight: 0.75 }
+  - { pattern: "\\bnão pertencem (aqui|a este país)\\b", weight: 0.75 }
+  - { pattern: "\\b(são|parecem) (uns |umas )?(animais|ratos|baratas|parasitas|selvagens|praga|lixo|escória)\\b", weight: 0.85 }
+  - { pattern: "\\b(invasão|invasores|invadem|infestam)\\b", weight: 0.65 }
+  # de
+  - { pattern: "\\b(geht|geh) (zurück|heim|nach hause)\\b", weight: 0.6 }
+  - { pattern: "\\bgehören nicht (hierher|hier her|nach deutschland|zu uns)\\b", weight: 0.75 }
+  - { pattern: "\\b(sind|seid) (alles |nur )?(tiere|ratten|kakerlaken|parasiten|ungeziefer|wilde|abschaum|dreck)\\b", weight: 0.85 }
+  - { pattern: "\\b(invasion|invasoren|überfremdung|umvolkung|abschieben|ausweisen|raus aus deutschland)\\b", weight: 0.7 }
+  # hi
+  - { pattern: "\\b(bhaga do|bhagao|nikalo|nikal do|khaded do|khadedo|wapas bhejo|vapas bhejo|bahar karo|bahar niklo)\\b", weight: 0.7 }
+  - { pattern: "\\b(ghuspaithiye|ghuspaithiya|ghuspethiye|deemak|dimak|keede|kide|janwar|jaanwar|kachra|kachre|gandagi)\\b", weight: 0.7 }
+  - { pattern: "(भगाओ|भगा दो|निकालो|निकाल दो|खदेड़ दो|खदेड़ो|वापस भेजो|बाहर करो)", weight: 0.7 }
+  - { pattern: "(दीमक|कीड़े|जानवर|कचरा|गंदगी|घुसपैठिये|घुसपैठिए)", weight: 0.7 }
+  # ar
+  - { pattern: "(اطردوهم|اطردوا|ارحلوا|يرحلوا|ارجعوا لبلادكم|رجعوهم|برا بلدنا|بره بلدنا)", weight: 0.7 }
+  - { pattern: "(حشرات|صراصير|فئران|جرذان|حيوانات|طفيليات|قذارة|وساخة|زبالة|همج)", weight: 0.7 }
+  - { pattern: "\\b(hasharat|sarasir|fe2ran|fi2ran|7ayawanat|zbala|zibala|wsa5a|wasa5a)\\b", weight: 0.7 }
+
+harassment:
+  # targeted harassment intensifiers (slurs are loaded from slurs.yaml and added to this category)
+  - { pattern: "\\b(filthy|dirty|stinking|smelly|disgusting|ugly|worthless|stupid|dumb|greedy|evil|wretched|vile|damn|goddamn) {G}\\b", weight: 0.8 }
+  - { pattern: "\\b{G} (scum|trash|garbage|pigs?|dogs?|bastards?|filth|vermin|rats?|whores?|bitch(es)?|idiots?|morons?)\\b", weight: 0.85 }
+  - { pattern: "\\b(f+u+c+k+|fuk|fck|fuq|screw|to hell with) (the |these |those |all |you )?{G}\\b", weight: 0.85 }
+  - { pattern: "\\b(f+u+c+k+ing|fuckin|fkn|fckn) {G}\\b", weight: 0.85 }
+  - { pattern: "\\b(i|we) (f+u+c+k+ing |really |truly |absolutely )?(hate|despise|loathe|can'?t stand) (the |these |those |all |every |you )?{G}\\b", weight: 0.85 }
+  - { pattern: "\\bhate (all|every|these|those) {G}\\b", weight: 0.85 }
+  - { pattern: "\\b(you|u|ur|you'?re|your) (f+u+c+k+ing |stupid |dirty |filthy |disgusting )?{G} (piece of (shit|crap|garbage)|scum|trash|bastard|bitch|whore|pig|dog|idiot|moron|rat)\\b", weight: 0.9 }
+  - { pattern: "\\b(shut up|stfu|shut your mouth|shut it)[, ]+(you )?(f+u+c+k+ing |stupid |dirty |filthy )?{G}\\b", weight: 0.85 }
+  - { pattern: "\\b{G} (are|r|is|is a|are a) (a |an |such a |nothing but a )?(disgrace|joke|embarrassment|menace|threat|problem|curse|blight|cancer|disease|plague)\\b", weight: 0.7 }
+  - { pattern: "\\bdie[, ]+(you )?{G}\\b", weight: 0.9 }
+  - { pattern: "\\b{G}[, ]+(you|u) (piece of shit|pos|scum|trash|bastard|bitch|pig|dog|idiot|moron|rat)\\b", weight: 0.9 }
+  - { pattern: "\\b(dumbass|dumb ass|stupid ass|ugly ass|dirty ass|nasty ass) {G}\\b", weight: 0.85 }
+  # es
+  - { pattern: "\\b(malditos|malditas|sucios|sucias|asquerosos|asquerosas|pinches|putos|putas|estúpidos|estúpidas|jodidos|jodidas|de mierda) {G}\\b", weight: 0.8 }
+  - { pattern: "\\b{G} (de mierda|asquerosos|asquerosas|sucios|sucias|basura|escoria|cerdos|perros|hijos de puta|malditos)\\b", weight: 0.85 }
+  - { pattern: "\\bodio a (los |las |todos los |todas las )?{G}\\b", weight: 0.85 }
+  # fr
+  - { pattern: "\\b(sales|salauds de|putains de|ces putains de|ces sales|foutus|ces enfoirés de|ces bâtards de) {G}\\b", weight: 0.8 }
+  - { pattern: "\\b{G} de merde\\b", weight: 0.85 }
+  - { pattern: "\\bje (déteste|hais|hait) (les |tous les |ces )?{G}\\b", weight: 0.85 }
+  # pt
+  - { pattern: "\\b(malditos|malditas|sujos|sujas|nojentos|nojentas|porcos|porcas|desgraçados|desgraçadas) {G}\\b", weight: 0.8 }
+  - { pattern: "\\b{G} (de merda|nojentos|nojentas|sujos|sujas|lixo|escória|porcos|filhos da puta|malditos|vagabundos)\\b", weight: 0.85 }
+  - { pattern: "\\bodeio (os |as |todos os |todas as )?{G}\\b", weight: 0.85 }
+  # de
+  - { pattern: "\\b(scheiß|scheiss|dreckige|verdammte|verfickte|verdammten|dreckigen|verfickten|blöde|dumme) {G}\\b", weight: 0.8 }
+  - { pattern: "\\b{G} ?(pack|gesindel|abschaum|dreck|schweine|schwein|bastarde|schmarotzer)\\b", weight: 0.85 }
+  - { pattern: "\\bich hasse (die |alle |diese )?{G}\\b", weight: 0.85 }
+  # hi (romanized)
+  - { pattern: "\\b(gande|ganda|gandi|kutte|kutta|kutti|kamine|kamina|kamini|haramkhor|haramzade|haramzada|harami|saale|sale|sala|saali|sali|madarchod|behenchod|bhenchod|chutiya|chutiye|bhosdike|randi|neech|nich|kaale|kale) {G}\\b", weight: 0.85 }
+  - { pattern: "\\b{G} (kutte|kutton|kamine|kaminon|harami|haramzade|haramkhor|saale|salon|chutiye|chutiya|madarchod|bhenchod|behenchod|gandu|randi|neech|ke bacche|ke pille|ki aulad)\\b", weight: 0.85 }
+  - { pattern: "\\b(mujhe|hum|hume|humein|main) {G} se nafrat (hai|h)\\b", weight: 0.85 }
+  - { pattern: "(गंदे|कुत्ते|कमीने|हरामखोर|हरामजादे|हरामी|साले|मादरचोद|भेनचोद|बहनचोद|चूतिये|भोसड़ीके|रंडी|नीच|काले) {G}", weight: 0.85 }
+  - { pattern: "{G} (कुत्ते|कुत्तों|कमीने|कमीनों|हरामी|हरामजादे|हरामखोर|साले|सालों|चूतिये|मादरचोद|भेनचोद|रंडी|नीच|के बच्चे|के पिल्ले|की औलाद)", weight: 0.85 }
+  # ar
+  - { pattern: "(يا |يلعن |الله يلعن |تبا ل|تباً ل|لعنة الله على )?(كلاب|خنازير|أوساخ|أوسخ|حقراء|أنجاس|نجس|نجسين|قذرين|أوغاد|ولاد الكلب|اولاد الكلب|أبناء الكلب|منحطين|حثالة) ?{G}", weight: 0.85 }
+  - { pattern: "{G} (كلاب|خنازير|أوساخ|أوسخ|حقراء|أنجاس|نجسين|قذرين|أوغاد|منحطين|حثالة|زبالة|حيوانات)", weight: 0.85 }
+  - { pattern: "(أكره|بكره|اكره|نكره) (كل |جميع )?{G}", weight: 0.85 }
+  - { pattern: "\\b(ya |yal3an |allah yel3an |tfeh 3ala |te7en 3ala )?(kilab|klab|5anazir|khanazir|wse5|awsa5|anjas|najsin|7oqara|7uqara|awghad|wlad el kalb|wlad l kelb|zbala|7ayawanat) ?{G}\\b", weight: 0.85 }
+  - { pattern: "\\b{G} (kilab|klab|5anazir|khanazir|wse5|awsa5|anjas|najsin|7oqara|awghad|zbala|7ayawanat)\\b", weight: 0.85 }
+  - { pattern: "\\b(bakrah|bakra|akrah|akra|nekrah|nakrah) (kol |kul |kull |gami3 |jami3 )?{G}\\b", weight: 0.85 }
+
+incitement:
+  - { pattern: "\\b(kill|murder|slaughter|butcher|shoot|hang|lynch|burn|gas|stone|behead|exterminate|eliminate|eradicate|annihilate|wipe out|wipe them out|wipe {G} out|purge|cleanse|massacre|execute|drown|bomb|nuke|attack|beat|stab) (all |every |the |these |those |them |every single |all the |all of the |all of them )?(of )?(the )?{G}\\b", weight: 0.95 }
+  - { pattern: "\\b(kill|murder|slaughter|shoot|hang|lynch|burn|gas|stone|behead|exterminate|eliminate|eradicate|annihilate|purge|cleanse|massacre|execute|drown|bomb|nuke) (them|em|'em|them all|every one of them|every last one|all of them)\\b", weight: 0.9 }
+  - { pattern: "\\b(wipe|stamp|root|clear|drive|flush) (them|{G}|em|'em) (all )?(out|off the (map|face of the earth|planet))\\b", weight: 0.9 }
+  # un-targeted calls to violence: only unambiguous violent verbs (ambiguous ones such as
+  # "get rid of" / "eliminate" / "remove" only score when a group target follows — see above)
+  - { pattern: "\\b(we|someone|somebody|they|people|y'?all|we all) (should|need to|must|have to|ought to|gotta|got to|need 2|should all|need to all) (all |just |really |finally )?(attack|kill|shoot|hang|lynch|burn|gas|bomb|exterminate|wipe out|hunt down|stone|behead|slaughter|massacre|stab|beat up|shoot up|blow up|gun down|string up|put down)\\b", weight: 0.9 }
+  - { pattern: "\\b(time to|it'?s time to|time we|let'?s|lets|let us|ready to|prepare to) (all |just |finally )?(attack|kill|shoot|hang|lynch|burn|gas|bomb|exterminate|wipe out|hunt down|take up arms|fight back against|start shooting|start killing|slaughter|massacre|gun down|string up)\\b", weight: 0.9 }
+  - { pattern: "\\b(we|someone|somebody|they|people|y'?all|time to|it'?s time to|let'?s|lets) (should|need to|must|have to|ought to|gotta|got to)? ?(all )?(eliminate|eradicate|purge|cleanse|get rid of|round up|hunt|remove|exterminate|wipe out|deal with|take care of) (all |every |the |these |those |every single |all of |all the )?(of )?(the )?{G}( once and for all| for good| permanently)?\\b", weight: 0.9 }
+  - { pattern: "\\b(death to|down with) (all |the |every )?{G}\\b", weight: 0.95 }
+  - { pattern: "\\b{G} (must|should|need to|needs to|deserve to|deserves to|ought to|will|gonna|gotta|have to) (all )?(die|be (killed|shot|hanged|hung|lynched|gassed|burned|burnt|exterminated|eliminated|eradicated|executed|beaten|stoned|beheaded|wiped out|purged|put down|rounded up|slaughtered|massacred|bombed))\\b", weight: 0.95 }
+  - { pattern: "\\b(deserve|deserves) (to die|to be (killed|shot|hanged|lynched|gassed|burned|beaten|stoned|executed|exterminated)|a bullet|death)\\b", weight: 0.85 }
+  - { pattern: "\\b(should|must|need to|needs to) (all )?(die|be (killed|shot|hanged|hung|lynched|gassed|burned|burnt|exterminated|eliminated|executed|beaten|stoned|beheaded|wiped out|purged|put down|rounded up|slaughtered))\\b", weight: 0.85 }
+  - { pattern: "\\b(ethnic cleansing|final solution|race war|racial holy war|rahowa|day of the rope|holy war against|genocide (them|the {G}|{G}|all {G}|is the answer|now)|total war on {G})\\b", weight: 0.95 }
+  - { pattern: "\\b(put|throw|lock) (them|em|'em|{G}) (all )?(in|into) (camps|gas chambers|ovens|cages|the ovens|the sea|the ocean)\\b", weight: 0.95 }
+  - { pattern: "\\b(burn|bomb|torch|blow up|attack|shoot up|destroy|raid) (down |up )?(their|the|every|all|all the|a) (mosques?|synagogues?|churches?|temples?|gurdwaras?|homes?|houses?|neighbou?rhoods?|shops?|businesses?|camps?|shelters?|schools?)\\b", weight: 0.95 }
+  - { pattern: "\\b(bring|grab|get|load) (your|the|my) (guns?|rifles?|rope|ammo|weapons?|machetes?|bats?)\\b[^.]{0,40}\\b{G}\\b", weight: 0.9 }
+  - { pattern: "\\b(open season|hunting season|declare war|go to war|wage war) on {G}\\b", weight: 0.95 }
+  - { pattern: "\\b(one bullet|a bullet|bullets) (each|per|for each|for every|for all) ?{G}?\\b", weight: 0.9 }
+  - { pattern: "\\b(rope|ropes|nooses?|gas chambers?|ovens|firing squads?|machetes?|guillotines?) (for|to|4) (all |every |the )?{G}\\b", weight: 0.95 }
+  - { pattern: "\\b(make (them|{G}) (pay|suffer|bleed) (with (their|there) (blood|lives)|for this in blood)|blood (will|must|should) (flow|be spilled|be shed))\\b", weight: 0.85 }
+  - { pattern: "\\b(kill (all|every|the|them|these|those|every single|all the)|kill 'em all|kill em all|kill them all)\\b", weight: 0.85 }
+  # es
+  - { pattern: "\\b(maten|matar|matemos|matenlos|mátenlos|hay que matar|exterminar|exterminen|quemar|quemen|fusilar|fusilen|colgar|cuelguen|linchar|linchen|bombardear|acabar con|hay que acabar con|eliminar|eliminen|erradicar|limpiar de) (a )?(todos los |todas las |los |las |estos |esos |todos |a los |a las |a todos los )?{G}\\b", weight: 0.95 }
+  - { pattern: "\\b(muerte a|mueran|que mueran|que se mueran|merecen morir|deben morir|hay que exterminar a) (los |las |todos los |todas las )?{G}\\b", weight: 0.95 }
+  - { pattern: "\\b(mátenlos|matenlos|quémenlos|quemenlos|cuélguenlos|cuelguenlos|fusílenlos|fusilenlos|acábenlos|que se mueran todos|hay que matarlos|matarlos a todos|exterminarlos)\\b", weight: 0.9 }
+  # fr
+  - { pattern: "\\b(tuez|tuer|il faut tuer|on doit tuer|exterminer|exterminez|il faut exterminer|brûler|brûlez|pendre|pendez|fusiller|fusillez|lyncher|bombarder|éliminer|éliminez|massacrer|massacrez|gazer|gazez|nettoyer|se débarrasser de|éradiquer|abattre) (tous les |toutes les |les |ces |tous ces |des )?{G}\\b", weight: 0.95 }
+  - { pattern: "\\b(mort aux|à mort les|à mort) {G}\\b", weight: 0.95 }
+  - { pattern: "\\b{G} (doivent|devraient|méritent de) (tous |toutes )?(mourir|crever|être (tués|pendus|brûlés|fusillés|gazés|exterminés|éliminés|massacrés|abattus))\\b", weight: 0.95 }
+  - { pattern: "\\b(tuez-les|tuez les|brûlez-les|pendez-les|gazez-les|fusillez-les|éliminez-les|exterminez-les|qu'ils crèvent|qu'ils meurent) (tous|toutes)?\\b", weight: 0.9 }
+  # pt
+  - { pattern: "\\b(matem|matar|vamos matar|tem que matar|temos que matar|exterminar|exterminem|queimar|queimem|enforcar|enforquem|fuzilar|fuzilem|linchar|linchem|bombardear|acabar com|eliminar|eliminem|erradicar|massacrar|limpar de|dar cabo de) (de )?(todos os |todas as |os |as |esses |essas |todos |todas )?{G}\\b", weight: 0.95 }
+  - { pattern: "\\b(morte aos|morte às|morte a|morram|que morram|merecem morrer|devem morrer|têm que morrer|tem que morrer) (os |as |todos os |todas as )?{G}\\b", weight: 0.95 }
+  - { pattern: "\\b(matem todos|matem eles|queimem eles|enforquem eles|fuzilem eles|acabem com eles|que morram todos|exterminem eles|matar todos eles)\\b", weight: 0.9 }
+  # de
+  - { pattern: "\\b(tötet|töten|wir müssen töten|man muss töten|ausrotten|vernichten|vernichtet|verbrennt|verbrennen|aufhängen|hängt|erschießen|erschiesst|erschießt|lyncht|lynchen|bombardieren|bombardiert|vergasen|vergast|abschlachten|schlachtet|auslöschen|löscht aus|beseitigen|beseitigt|ausmerzen|eliminieren|eliminiert|abknallen|knallt ab) (alle |die |diese |alle diese |sämtliche )?{G}\\b", weight: 0.95 }
+  - { pattern: "\\b(tod den|tod allen|tod für|tod für alle) {G}\\b", weight: 0.95 }
+  - { pattern: "\\b{G} (müssen|sollten|sollen|verdienen es zu|gehören) (alle )?(sterben|weg|vergast|erschossen|aufgehängt|getötet|ausgerottet|vernichtet|verbrannt|abgeknallt|an die wand gestellt)( werden)?\\b", weight: 0.95 }
+  - { pattern: "\\b(tötet sie alle|vergast sie|erschießt sie|hängt sie auf|verbrennt sie|rottet sie aus|vernichtet sie|knallt sie ab|alle an die wand)\\b", weight: 0.9 }
+  # hi (romanized + script)
+  - { pattern: "\\b(maar do|maar dalo|mar do|mar dalo|maro|maaro|marna chahiye|maarna chahiye|jala do|jalao|kaat do|kaato|goli maro|goli maar do|goli mar do|latka do|phansi do|phaansi do|khatam kar do|khatam karo|mita do|mitao|ukhaad do|saaf kar do|saaf karo|safaya kar do|safaya karo|jaan se maar do|jaan se maro|katl kar do|katl karo|udaa do|uda do|bomb maro|bomb maar do|hamla karo|humla karo) (in |un |sab |sabhi |saare |sare |is |us |ye |ya |yeh |inn |unn |in sab |un sab )?(ko |ke )?{G}?\\b", weight: 0.9 }
+  - { pattern: "\\b{G} (ko|ka|ki|ke) (maar do|maar dalo|mar do|mar dalo|maro|maaro|marna chahiye|maarna chahiye|jala do|jalao|kaat do|kaato|goli maro|goli maar do|latka do|phansi do|phaansi do|khatam kar do|khatam karo|mita do|mitao|ukhaad do|safaya kar do|safaya karo|jaan se maar do|katl kar do|katl karo|uda do|udaa do|saaf kar do|saaf karo|bomb maro|hamla karo|humla karo|nash kar do|vinash kar do|sar kaat do|sir kaat do)\\b", weight: 0.95 }
+  - { pattern: "\\b{G} (marne chahiye|marne chahiye the|marna chahiye|mar jane chahiye|mar jaane chahiye|mar jaye|mar jaayein|mar jayein|marenge|marne layak hain|marne layak hai|marne ke layak hain|jeene layak nahi|jine layak nahi|jinda nahi rehne chahiye|zinda nahi rehne chahiye)\\b", weight: 0.95 }
+  - { pattern: "(मार दो|मार डालो|मारो|मारना चाहिए|जला दो|जलाओ|काट दो|काटो|गोली मारो|गोली मार दो|लटका दो|फांसी दो|फाँसी दो|खत्म कर दो|खत्म करो|मिटा दो|मिटाओ|उखाड़ दो|साफ कर दो|सफाया कर दो|सफाया करो|जान से मार दो|कत्ल कर दो|उड़ा दो|बम मारो|हमला करो|नाश कर दो|विनाश कर दो|सर काट दो|सिर काट दो)", weight: 0.9 }
+  - { pattern: "{G} (मरने चाहिए|मरना चाहिए|मर जाने चाहिए|मर जाएं|मरेंगे|मरने लायक हैं|जीने लायक नहीं|जिंदा नहीं रहने चाहिए)", weight: 0.95 }
+  # ar
+  - { pattern: "(اقتلوا|اقتل|نقتل|يجب قتل|لازم نقتل|اذبحوا|اذبح|نذبح|احرقوا|احرق|اشنقوا|اعدموا|فجروا|أبيدوا|ابيدوا|نبيد|أبادة|إبادة|ابادة|نطهر|طهروا|تطهير|اقصفوا|اقصف|ادبحوا|ارجموا|اجلدوا|اقطعوا رؤوس|اقطعوا رقاب|اسحقوا|نسحق|امحوا|نمحو) (كل |جميع |هؤلاء |ال)?{G}", weight: 0.95 }
+  - { pattern: "(الموت ل|الموت لكل|موت ل|الموت لجميع|يسقط|تسقط) ?{G}", weight: 0.95 }
+  - { pattern: "{G} (يجب أن يموتوا|يجب ان يموتوا|لازم يموتوا|يستحقون الموت|يستحقوا الموت|يجب قتلهم|لازم يتقتلوا|يجب إبادتهم|يجب ابادتهم|لازم ينذبحوا|يجب ذبحهم|لازم يتذبحوا|يجب حرقهم|يجب شنقهم|يجب إعدامهم|لازم يتعدموا)", weight: 0.95 }
+  - { pattern: "(اقتلوهم|اقتلوهم كلهم|اذبحوهم|احرقوهم|اشنقوهم|اعدموهم|أبيدوهم|ابيدوهم|فجروهم|امحوهم|اسحقوهم|اقصفوهم|ادبحوهم|اقتلوهم جميعا|اقتلوهم جميعاً|موتوا|يموتوا كلهم|خلوهم يموتوا|بدهم موت|يستاهلوا الموت|يستاهلو الموت|يستحقوا الموت|يستحقون الموت)", weight: 0.9 }
+  - { pattern: "\\b(o2tolo|o2tlo|oqtolo|uqtulu|iqtulu|2tlo|2otlo|edb7o|edba7o|idba7o|edba7oh|7er2o|7ar2o|i7r2o|eshn2o|eshna2o|e3dmo|e3demo|fagro|fajro|abido|bido|n6ahar|tahhero|ta6hero|o2sfo|oqsofo|erjmo|irjmo|es7a2o|is7a2o|em7o|im7o) (kol |kul |kull |gami3 |jami3 |hadol |hadola |ha2ola2 |el |al |il )?{G}\\b", weight: 0.95 }
+  - { pattern: "\\b(el mot l|el moot l|almawt l|almot l|al mawt li|el mawt li|mawt li|moot li|yas2ot|yasqut|tas2ot|tasqut) ?{G}\\b", weight: 0.95 }
+  - { pattern: "\\b{G} (lazem ymoto|lazem ymooto|lazim yamoto|yesta7lo el mot|yesta7lo el moot|yesta7lo almawt|yesta7ako el mot|lazem yet2atlo|lazem ytqtlo|lazem yetdab7o|lazem yet7ar2o|lazem yetshan2o|lazem yet3dmo|lazem yenbado|lazem ynbado)\\b", weight: 0.95 }
+  - { pattern: "\\b(o2tolohom|o2tlohom|oqtolohom|uqtuluhum|edb7ohom|edba7ohom|idba7uhum|7er2ohom|7ar2ohom|eshn2ohom|e3dmohom|abidohom|bidohom|fagrohom|fajrohom|em7ohom|es7a2ohom|o2sfohom|o2tolohom kolhom|o2tlohom kolhom|ymoto kolhom|ymooto kolhom|5alohom ymoto|khalohom ymoto|bedhom mot|bedhom moot|yesta7lo el mot|yesta7lo el moot)\\b", weight: 0.9 }
+
+# Generic offensive language (Task A "Offensive" when no protected-group target is involved).
+offensive:
+  - { pattern: "\\b(f+u+c+k+\\w*|fck\\w*|fuk\\w*|sh[i1]t\\w*|b[i1]tch\\w*|a+ss+h+o+l+e+s?|bastards?|d[i1]ck(head)?s?|c+u+n+t+s?|p[i1]ss(ed)? off|wank\\w*|bollocks|twats?|pr[i1]cks?|douche\\w*|motherf\\w+|mf|stfu|gtfo|wtf|piece of (shit|crap)|pos)\\b", weight: 0.6 }
+  - { pattern: "\\b(idiot|idiots|moron|morons|imbecile|stupid|dumb|dumbass|retard\\w*|loser|losers|pathetic|clown|clowns|scum|scumbag|trash|garbage|worthless|disgusting|ugly|fat|freak|freaks|creep|weirdo|dirtbag|lowlife|sleazebag|dipshit|jackass|jerk|jerks|numbnuts|halfwit|nitwit|airhead|bonehead|blockhead|meathead|knucklehead|ignorant|ignoramus|hypocrite|liar|liars|fraud|coward|cowards|snowflake|libtard|cuck|simp|incel)\\b", weight: 0.45 }
+  - { pattern: "\\b(shut up|shut the (hell|fuck) up|screw you|get lost|go to hell|kys|kill yourself|go die|drop dead|rot in hell|burn in hell|eat shit|suck it|bite me|kiss my ass|blow me|piss off|sod off|bugger off|get bent|up yours|screw off)\\b", weight: 0.65 }
+  # es / fr / pt / de / hi / ar generic profanity
+  - { pattern: "\\b(mierda|joder|puta|puto|pendejo|pendeja|cabrón|cabron|cabrones|imbécil|imbecil|idiota|estúpido|estupido|gilipollas|coño|cono|carajo|chinga\\w*|verga|culero|mamón|mamon|hijo de puta|hija de puta|hijueputa|hdp|maldito|maldita|basura|escoria|asqueroso|asquerosa|pinche|cállate|callate|vete a la mierda|lárgate|largate)\\b", weight: 0.55 }
+  - { pattern: "\\b(merde|putain|connard|connasse|con|conne|salope|salaud|enculé|encule|enfoiré|enfoire|bâtard|batard|abruti|crétin|cretin|débile|debile|idiot|imbécile|imbecile|pute|fils de pute|fdp|ta gueule|ftg|nique|niquer|va te faire|dégage|degage|casse-toi|casse toi|pourriture|ordure|raclure|bouffon)\\b", weight: 0.55 }
+  - { pattern: "\\b(merda|porra|caralho|puta|puto|filho da puta|fdp|vai se foder|vsf|vai tomar no cu|vtnc|cuzão|cuzao|babaca|otário|otario|idiota|imbecil|burro|burra|escroto|escrota|arrombado|arrombada|desgraçado|desgracado|lixo|nojento|nojenta|cala a boca|cala boca|some daqui|vaza)\\b", weight: 0.55 }
+  - { pattern: "\\b(scheiße|scheisse|scheiss|scheiß|verdammt|arschloch|arsch|wichser|fotze|hurensohn|hure|schlampe|idiot|idioten|trottel|depp|vollidiot|vollpfosten|spast|spasti|missgeburt|drecksau|dreckskerl|schwein|schweine|halt die fresse|halt's maul|halts maul|halt die klappe|verpiss dich|hau ab|fick dich|leck mich|abschaum|pack|gesindel|müll|dreck)\\b", weight: 0.55 }
+  - { pattern: "\\b(chutiya|chutiye|chutia|bhosdike|bhosdi ke|bhosdiwale|madarchod|maderchod|mc|behenchod|bhenchod|benchod|bc|gandu|gaandu|gaand|gand|lund|lawde|lauda|laude|loda|lode|harami|haramzada|haramzade|haramkhor|kutta|kutte|kutti|kamina|kamine|kamini|saala|saale|sala|sale|saali|sali|randi|raand|bewakoof|bevkoof|gadha|gadhe|ullu|ullu ka pattha|pagal|paagal|nalayak|nikamma|bakwas|bakwaas|chup kar|chup ho ja|bhaag|bhag yahan se|dafa ho|dafa ho ja|nikal|nikal yahan se|ghatiya|neech|kameena|kameene)\\b", weight: 0.55 }
+  - { pattern: "(चूतिया|चूतिये|भोसड़ीके|भोसड़ी के|मादरचोद|भेनचोद|बहनचोद|गांडू|गांड|लंड|लौड़े|लौड़ा|हरामी|हरामजादा|हरामजादे|हरामखोर|कुत्ता|कुत्ते|कुत्ती|कमीना|कमीने|कमीनी|साला|साले|साली|रंडी|रांड|बेवकूफ|गधा|गधे|उल्लू|पागल|नालायक|निकम्मा|बकवास|चुप कर|चुप हो जा|भाग|दफा हो|निकल|घटिया|नीच)", weight: 0.55 }
+  - { pattern: "(كس أم|كس ام|كسم|كسمك|كس اختك|ابن الكلب|ابن كلب|ابن الشرموطة|ابن المتناكة|ابن العرص|يا عرص|عرص|شرموط|شرموطة|شراميط|زبالة|حقير|حقيرة|واطي|واطية|حيوان|حمار|حمارة|غبي|غبية|أهبل|اهبل|معفن|منيك|متناك|متناكة|خول|خنيث|كلب|كلبة|خنزير|تفو|تفوه|طز|طز فيك|انقلع|اخرس|اسكت|اطلع برا|ولاك|يلعن|يلعن أبوك|الله يلعنك|لعنة|أحا|احا)", weight: 0.55 }
+  - { pattern: "\\b(kosom|kos om|kosomak|kosommak|kos okhtak|kos o5tak|ibn el kalb|ibn kalb|ibn el sharmouta|ibn el sharmoota|ibn el mitnaka|ibn el 3ars|ya 3ars|3ars|sharmout|sharmoot|sharmouta|sharmoota|sharameet|zbala|zebala|7a2eer|7a2ir|7aqir|wati|waty|7ayawan|7omar|7mar|homar|ghabi|ghabee|ahbal|m3affen|m3afen|manyak|manyook|mitnak|mitnaka|khawal|5awal|kalb|kalba|khanzeer|5anzeer|tfeh|tfoo|toz|toz feek|toz fik|en2ele3|in2ili3|e5ras|ekhras|oskot|uskut|etla3 barra|itla3 barra|wlak|yl3an|yel3an|yel3an abook|allah yel3anak|la3na|a7a|a7aa)\\b", weight: 0.55 }
+
+# Counter-speech / condemnation cues (Module 6).  Negative evidence: the post is *about*
+# hate rather than *expressing* it.  Applied as attribution weights < 0 and as a stance signal.
+counterspeech:
+  - { pattern: "\\b(this|that|it|what (he|she|they) said|his comment|her comment|their comment|this post|this tweet|this take) (is|was|sounds|seems|feels) ?(so |really |blatantly |openly |incredibly |absolutely |extremely |just |pure |straight[- ]up )?(racist|racism|bigoted|bigotry|xenophobic|xenophobia|islamophobic|islamophobia|antisemitic|anti-semitic|antisemitism|hateful|hate speech|discriminat(ory|ion)|disgusting|vile|unacceptable|not ok(ay)?|wrong|dehumani[sz]ing|prejudiced|hate)\\b", weight: 0.85 }
+  - { pattern: "\\b(how|why) (is|are|can|could|do|does|did|would) (this|that|anyone|people|someone|you|they) (be |still |even |possibly )?(okay|ok|allowed|say|saying|think|post|posting|tweet|tweeting|defend|justify|believe)\\b", weight: 0.6 }
+  - { pattern: "\\b(condemn|condemns|condemned|condemning|denounce|denounces|denounced|call(ing|ed)? out|report(ed|ing)? (this|them|him|her|it)|reported and blocked|reporting this|shame on|disgusted by|disgusting that|disgusted that|appalled|appalling|horrified|horrifying|sickening|sickened|ashamed|unacceptable|not acceptable|should be ashamed|do better|be better|we (must|need to|have to) (stand|speak|push back|fight) (against|up to)|stand (against|with|in solidarity)|solidarity with|in solidarity|stop the hate|no place for|there'?s no place for|zero tolerance for|not in (my|our) name|not okay to|it'?s not ok(ay)? to|never ok(ay)? to)\\b", weight: 0.75 }
+  - { pattern: "\\b(stop|quit|enough|end|fight|combat|counter|against|tackle|tackling|combating|confronting|addressing|challenging|unlearn|dismantle) (the )?(hate|hatred|racism|bigotry|xenophobia|islamophobia|antisemitism|anti-semitism|discrimination|prejudice|hate speech|racial profiling|stereotyping|dehumani[sz]ation)\\b", weight: 0.8 }
+  - { pattern: "\\b(imagine|can'?t believe|cannot believe|unbelievable that|can you believe|i can'?t believe) (people|someone|anyone|somebody|folks|you|he|she|they) (still |actually |really |genuinely |openly )?(say|saying|think|thinking|post|posting|tweet|tweeting|believe|believing|write|writing|defend|defending|talk|talking)\\b", weight: 0.6 }
+  - { pattern: "\\b(the (racism|bigotry|hate|hatred|xenophobia|islamophobia|antisemitism|dehumani[sz]ation|discrimination|prejudice) (in|on|of|from|against|towards?|directed at|aimed at|targeting|faced by|experienced by)|(racism|bigotry|hate|xenophobia|islamophobia|antisemitism|discrimination|prejudice) (against|towards?|directed at|aimed at|targeting|faced by|experienced by))\\b", weight: 0.65 }
+  - { pattern: "\\b(research|study|studies|report|data|survey|analysis|paper|dataset|article|documenting|documented|documents|tracking|tracked|monitor(ing|ed)?|analy[sz](e|ed|ing|is)|examin(e|ed|ing)|found that|shows that|show that|according to)\\b[^.]{0,80}\\b(hate speech|hate crimes?|racism|bigotry|xenophobia|islamophobia|antisemitism|discrimination|slurs?|prejudice|toxicity|abuse|harassment)\\b", weight: 0.7 }
+  - { pattern: "\\b(quote|quoting|quoted|screenshot|screenshotted|screencap|receipts|for the record|he (said|wrote|posted|tweeted)|she (said|wrote|posted|tweeted)|they (said|wrote|posted|tweeted)|someone (said|wrote|posted|tweeted|told me|dm'?d me|messaged me)|got (called|told)|was called|been called|being called|called me|calling me|told me to|telling me to|someone commented|comment i (got|received)|dm i (got|received)|message i (got|received)|the replies|look at (the|these) replies|in my mentions|in my dms|in my inbox)\\b", weight: 0.55 }
+  - { pattern: "\\b(as a (black|asian|muslim|jewish|hindu|sikh|latino|latina|hispanic|indigenous|arab|immigrant|refugee|mexican|indian|pakistani|chinese|nigerian|syrian|palestinian|israeli) (person|man|woman|kid|student|american|brit|canadian)|my (family|parents|people|community|grandparents|ancestors) (were|was|have been|are|had been|got|faced|experienced|survived|endured|went through))\\b", weight: 0.5 }
+  - { pattern: "\\b(sarcasm|/s|sarcastic|joking|just kidding|jk|obviously joking|satire|parody|ironic|irony)\\b", weight: 0.3 }
+  # es
+  - { pattern: "\\b(esto es|eso es|qué|que) (racismo|racista|xenofobia|xenófobo|xenofobo|islamofobia|islamófobo|antisemitismo|antisemita|discriminación|discriminacion|odio|discurso de odio|asqueroso|inaceptable|vergonzoso)\\b", weight: 0.85 }
+  - { pattern: "\\b(condeno|condenamos|denuncio|denunciamos|repudio|repudiamos|rechazo|rechazamos|basta de|no al|alto al|contra el|luchemos contra|combatir el|solidaridad con|no en mi nombre|vergüenza|verguenza|indignante|reportado|reporten|denuncien)\\b", weight: 0.75 }
+  # fr
+  - { pattern: "\\b(c'?est|c est|ceci est|cela est|quel|quelle) (du )?(racisme|raciste|xénophobie|xenophobie|xénophobe|xenophobe|islamophobie|islamophobe|antisémitisme|antisemitisme|antisémite|antisemite|discrimination|discriminatoire|de la haine|discours de haine|dégueulasse|degueulasse|inacceptable|honteux|honteuse)\\b", weight: 0.85 }
+  - { pattern: "\\b(je condamne|nous condamnons|je dénonce|nous dénonçons|stop au|stop à la|non au|non à la|halte au|contre le|contre la|lutter contre|combattre le|solidarité avec|pas en mon nom|honte à|honte sur|scandaleux|scandaleuse|signalé|signalez)\\b", weight: 0.75 }
+  # pt
+  - { pattern: "\\b(isso é|isto é|isso foi|que) (racismo|racista|xenofobia|xenófobo|xenofobo|islamofobia|islamofóbico|antissemitismo|antissemita|discriminação|discriminacao|discriminatório|ódio|odio|discurso de ódio|nojento|inaceitável|inaceitavel|vergonhoso)\\b", weight: 0.85 }
+  - { pattern: "\\b(condeno|condenamos|denuncio|denunciamos|repudio|repudiamos|rechaço|chega de|basta de|não ao|nao ao|contra o|contra a|lutar contra|combater o|solidariedade com|não em meu nome|vergonha|revoltante|denunciado|denunciem)\\b", weight: 0.75 }
+  # de
+  - { pattern: "\\b(das ist|dies ist|was für|so ein|so eine|einfach nur) (purer |reiner |offener |blanker )?(rassismus|rassistisch|fremdenfeindlichkeit|fremdenfeindlich|ausländerfeindlich|islamfeindlichkeit|islamfeindlich|antisemitismus|antisemitisch|diskriminierung|diskriminierend|hass|hassrede|hetze|volksverhetzung|widerlich|inakzeptabel|beschämend|schändlich|menschenverachtend)\\b", weight: 0.85 }
+  - { pattern: "\\b(ich verurteile|wir verurteilen|verurteile|verurteilen|kein platz für|gegen rassismus|gegen hass|gegen hetze|gegen fremdenfeindlichkeit|solidarität mit|nicht in meinem namen|schämt euch|schäm dich|gemeldet|meldet das|meldet ihn|meldet sie|anzeige erstattet|zur anzeige gebracht)\\b", weight: 0.75 }
+  # hi
+  - { pattern: "\\b(ye|yeh|yah|isko|is ko|aisa|aise) (bilkul |bahut |sarasar |khullam khulla )?(galat|ghalat|sharamnak|sharmnaak|sharmnak|nafrat|nafrat bhara|nafrat faila|bhedbhav|bhed bhav|jatiwad|jaativaad|jaatiwad|sampradayik|sampradayikta|dharm ke naam par|manavta ke khilaf|insaniyat ke khilaf)\\b", weight: 0.85 }
+  - { pattern: "\\b(nafrat (mat|na) (failao|phailao|karo)|nafrat band karo|nafrat ko na|bhedbhav band karo|nafrat ke khilaf|nafrat ke khilaaf|sharam karo|sharm karo|sharam aani chahiye|sharm aani chahiye|report kiya|report karo|report kar diya|ninda karta hoon|ninda karte hain|ninda karti hoon|nindaniya|hum sab ek hain|hindu muslim sikh isai|sab ek hain|insaniyat sabse badi|manavta sabse badi)\\b", weight: 0.75 }
+  - { pattern: "(ये|यह|इसको|ऐसा) (बिल्कुल |बहुत |सरासर )?(गलत|शर्मनाक|नफरत|नफरत भरा|भेदभाव|जातिवाद|सांप्रदायिक|साम्प्रदायिक|मानवता के खिलाफ|इंसानियत के खिलाफ)", weight: 0.85 }
+  - { pattern: "(नफरत (मत|ना) (फैलाओ|करो)|नफरत बंद करो|भेदभाव बंद करो|नफरत के खिलाफ|शर्म करो|शर्म आनी चाहिए|रिपोर्ट किया|रिपोर्ट करो|निंदा करता हूं|निंदा करते हैं|निंदनीय|हम सब एक हैं|सब एक हैं|इंसानियत सबसे बड़ी|मानवता सबसे बड़ी)", weight: 0.75 }
+  # ar
+  - { pattern: "(هذا|هذه|هاد|هادي|هاي|ده|دي|هذا الكلام|هاد الكلام|الكلام ده) (عنصرية|عنصري|كراهية|خطاب كراهية|تمييز|تحريض|طائفية|طائفي|عيب|مرفوض|غير مقبول|مقرف|مخزي|معيب)", weight: 0.85 }
+  - { pattern: "(أدين|ندين|نستنكر|أستنكر|استنكر|ندين بشدة|أدين بشدة|لا للعنصرية|لا للكراهية|لا للتمييز|لا للطائفية|ضد العنصرية|ضد الكراهية|ضد التمييز|ضد الطائفية|كفى عنصرية|كفى كراهية|كفاية عنصرية|كفاية كراهية|تضامن مع|متضامن مع|متضامنين مع|ليس باسمي|مش باسمي|عيب عليك|عيب عليكم|حرام عليك|حرام عليكم|تم الإبلاغ|بلغت عنه|بلغوا عنه|ابلغوا عنه|كلنا واحد|كلنا إخوة|كلنا اخوة|الدين لله والوطن للجميع)", weight: 0.75 }
+  - { pattern: "\\b(hada|hadi|hay|dah|di|da|hada el kalam|el kalam dah|had lkalam) (3onsoreya|3onsoriya|3onsory|3onsori|onsoriya|kraheya|karahiya|kurh|5itab kraheya|khitab karahiya|tamyeez|tamyiz|ta7reed|ta7rid|ta2efiya|ta2ifiya|ta2efy|3eeb|3aib|marfood|marfoud|mesh ma2bool|mish ma2bul|mo2ref|mu2rif|mo5zi|mukhzi)\\b", weight: 0.85 }
+  - { pattern: "\\b(odeen|udin|nodeen|nudin|nastanker|astanker|astankir|la lel3onsoreya|la lil3onsoriya|la lelkraheya|la lilkarahiya|la leltamyeez|la liltamyiz|la letta2efiya|la lilta2ifiya|ded el3onsoreya|did al3onsoriya|ded elkraheya|did alkarahiya|kefaya 3onsoreya|kifaya 3onsoriya|kefaya kraheya|kifaya karahiya|tadamon ma3|tadamun ma3|motadamen ma3|mutadamin ma3|mesh besmi|mish bismi|laysa bismi|3eeb 3aleek|3aib 3alik|3eeb 3aleeko|3aib 3alikom|7aram 3aleek|7aram 3alik|7aram 3aleeko|7aram 3alikom|tam el eblagh|balaght 3anno|balaghto 3anno|ablegho 3anno|kolna wa7ed|kulna wa7id|kolna e5wa|kulna ikhwa|el deen lellah wel watan leljamee3)\\b", weight: 0.75 }
