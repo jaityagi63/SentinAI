@@ -45,22 +45,121 @@ def seed(n_posts: int = 1600, seed_value: int = 42, reset: bool = typer.Option(F
     typer.echo(f"seeded {n} posts")
 
 
-@app.command()
-def ingest(query: str, pages: int = 5, recent: bool = typer.Option(False, help="Use /search/recent instead of full-archive"), start_time: str | None = None):
-    """Fetch posts from the X API v2 for QUERY, persist, classify and refresh analytics."""
-    from sentinai.analytics.accounts import score_all_accounts
-    from sentinai.analytics.bots import score_all_authors
-    from sentinai.ingestion.worker import IngestionWorker
+def _report_echo(report) -> None:
+    d = report.to_dict()
+    typer.echo(f"{d['kind']}: fetched {d['fetched']}, ingested {d['ingested']} (toxic {d['toxic']}) via {d['endpoint']} in {d['duration_seconds']}s")
+    if d["by_label"]:
+        typer.echo("  labels: " + ", ".join(f"{k}={v}" for k, v in sorted(d["by_label"].items())))
+    for w in d["warnings"]:
+        typer.echo(f"  warning: {w}")
+
+
+def _x_client(max_wait: float | None = None):
+    from sentinai.ingestion.credentials import get_bearer_token
     from sentinai.ingestion.x_client import XClient
+
+    token = get_bearer_token()
+    if not token:
+        raise typer.BadParameter("No X API bearer token — set SENTINAI_X_BEARER_TOKEN (or save one in the dashboard under Ingest → Connect X)")
+    return XClient(bearer_token=token, max_wait=max_wait)
+
+
+@app.command()
+def ingest(
+    query: str,
+    pages: int = typer.Option(5, help="Pages of 100 (recent) / 500 (full-archive) posts"),
+    full_archive: bool = typer.Option(False, "--full-archive", help="Use /tweets/search/all (needs full-archive access; falls back to recent)"),
+    recent: bool = typer.Option(False, help="Deprecated — recent search is the default now"),
+    start_time: str | None = typer.Option(None, help="ISO-8601, e.g. 2026-09-01T00:00:00Z"),
+    end_time: str | None = None,
+    no_cursor: bool = typer.Option(False, "--no-cursor", help="Ignore the stored since_id and re-fetch the window"),
+    media: bool = typer.Option(False, help="Download photo attachments for the vision pipeline"),
+):
+    """Search X (API v2) for QUERY and run every hit through the pipeline.
+
+    Example: sentinai ingest '(muslims OR islam) lang:en -is:retweet' --pages 3
+    """
+    from sentinai.ingestion.worker import IngestionWorker, IngestReport
     from sentinai.storage.db import init_db, session_scope
 
     init_db()
-    client = XClient()
+    client = _x_client()
+    report = IngestReport(kind="search", query=query)
     with session_scope() as session:
-        n = IngestionWorker(session, client).run_query(query, full_archive=not recent, max_pages=pages, start_time=start_time)
-        score_all_authors(session)
-        score_all_accounts(session)
-    typer.echo(f"ingested {n} posts for query {query!r}")
+        IngestionWorker(session, client, download_media=media).run_query(query, full_archive=full_archive or None, max_pages=pages, start_time=start_time, end_time=end_time, use_cursor=not no_cursor, report=report)
+    _report_echo(report)
+
+
+@app.command("ingest-tweet")
+def ingest_tweet(refs: list[str] = typer.Argument(..., help="Tweet URLs or ids"), conversation: bool = typer.Option(False, help="Also pull the replies"), media: bool = False):
+    """Ingest one or more tweets by URL / id (plus their parent chain)."""
+    from sentinai.ingestion.worker import IngestionWorker
+    from sentinai.storage.db import init_db, session_scope
+
+    init_db()
+    client = _x_client()
+    with session_scope() as session:
+        worker = IngestionWorker(session, client, download_media=media)
+        for ref in refs:
+            _report_echo(worker.run_tweet(ref, include_conversation=conversation))
+
+
+@app.command("ingest-user")
+def ingest_user(username: str, pages: int = 3, exclude_replies: bool = False, exclude_retweets: bool = False, start_time: str | None = None, media: bool = False):
+    """Ingest a user's timeline (@handle or profile URL)."""
+    from sentinai.ingestion.worker import IngestionWorker
+    from sentinai.storage.db import init_db, session_scope
+
+    init_db()
+    client = _x_client()
+    with session_scope() as session:
+        _report_echo(IngestionWorker(session, client, download_media=media).run_user(username, max_pages=pages, exclude_replies=exclude_replies, exclude_retweets=exclude_retweets, start_time=start_time))
+
+
+@app.command("ingest-stream")
+def ingest_stream(
+    rule: list[str] = typer.Option([], "--rule", "-r", help="Filtered-stream rule (repeatable); replaces existing rules when given"),
+    sample: bool = typer.Option(False, help="Use the 1% sampled stream"),
+    max_posts: int | None = None,
+    max_minutes: float | None = None,
+    media: bool = False,
+):
+    """Connect to the filtered stream and classify posts as they arrive (Ctrl-C to stop)."""
+    import signal
+    import threading
+
+    from sentinai.ingestion.worker import IngestionWorker
+    from sentinai.storage.db import init_db, session_scope
+
+    init_db()
+    client = _x_client()
+    if rule and not sample:
+        rules = client.set_stream_rules([{"value": r} for r in rule])
+        typer.echo("rules: " + "; ".join(r["value"] for r in rules))
+    stop = threading.Event()
+    signal.signal(signal.SIGINT, lambda *_: stop.set())
+    with session_scope() as session:
+        worker = IngestionWorker(session, client, download_media=media, progress=lambda stage, n: typer.echo(f"  {stage}: {n}", err=True))
+        _report_echo(worker.run_stream(max_posts=max_posts, max_seconds=max_minutes * 60 if max_minutes else None, stop=stop, sample=sample))
+
+
+@app.command("import")
+def import_file(paths: list[Path] = typer.Argument(..., exists=True, readable=True), hydrate_parents: bool = typer.Option(False, help="Fetch missing parents from X (needs a token)")):
+    """Import X API JSON/JSONL dumps, an X data archive (tweets.js / .zip), CSV or plain text."""
+    from sentinai.ingestion.worker import IngestionWorker
+    from sentinai.storage.db import init_db, session_scope
+
+    init_db()
+    client = None
+    if hydrate_parents:
+        try:
+            client = _x_client()
+        except typer.BadParameter as exc:
+            typer.echo(f"warning: {exc} — importing without parent hydration", err=True)
+    with session_scope() as session:
+        worker = IngestionWorker(session, client)
+        for path in paths:
+            _report_echo(worker.run_import(path.read_bytes(), path.name, hydrate_parents=client is not None))
 
 
 @app.command()

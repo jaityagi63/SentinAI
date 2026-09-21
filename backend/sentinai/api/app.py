@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from sentinai import __version__
-from sentinai.api import routes_analytics, routes_core, routes_review
+from sentinai.api import routes_analytics, routes_core, routes_ingest, routes_review
 from sentinai.auth import bootstrap_users
 from sentinai.config import REPO_DIR, get_settings
 from sentinai.storage.db import init_db, session_scope
@@ -46,6 +46,7 @@ def create_app() -> FastAPI:
     app = FastAPI(title="SentinAI API", version=__version__, description="Social Media Bias & Hate Speech Intelligence Platform", lifespan=lifespan, docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None)
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
     app.include_router(routes_core.router, prefix="/api")
+    app.include_router(routes_ingest.router, prefix="/api")
     app.include_router(routes_analytics.router, prefix="/api")
     app.include_router(routes_review.router, prefix="/api")
 

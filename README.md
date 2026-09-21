@@ -96,7 +96,7 @@ SentinAI/
 │   ├── sentinai/
 │   │   ├── config.py                   pydantic-settings (env prefix SENTINAI_), paths
 │   │   ├── schemas.py                  Pydantic domain models & enums (labels, targets, severity, stance, roles)
-│   │   ├── ingestion/                  M1  x_client.py (X API v2, backoff, queue), worker.py, compliance.py
+│   │   ├── ingestion/                  M1  x_client.py (X API v2: search/tweet/user/stream), importers.py, jobs.py, media.py, worker.py, compliance.py
 │   │   ├── preprocessing/              M2  normalize.py, obfuscation.py, dedup.py (MinHash/LSH)
 │   │   │                               M7  language.py (FastText LID + fallback, code-switching, transliteration)
 │   │   ├── classification/             M3  lexicon.py, heuristic.py (Tasks A/B/C), transformer.py (optional heads)
@@ -126,16 +126,38 @@ SentinAI/
 
 ## How each module is implemented
 
-### M1 — Data ingestion
-`ingestion/x_client.py` wraps X API v2 *recent* and *full-archive* search with the expansions
-needed for author, engagement, reply chains (`referenced_tweets`, `conversation_id`) and media
-(`attachments.media_keys`). Rate limiting uses the `x-rate-limit-*` headers plus exponential
-backoff with jitter (`SENTINAI_X_BACKOFF_*`), and an in-process queue (`enqueue/drain`) buffers
-work. `ingestion/worker.py` runs preprocessing + classification and persists metadata to
-**PostgreSQL/SQLite** (SQLAlchemy) and raw JSON to **MongoDB** or a JSONL file store.
-`ingestion/compliance.py` implements the X compliance stream contract (mark posts deleted
-upstream, never re-serve them), GDPR/CCPA-style retention (`SENTINAI_RETENTION_DAYS`) and author
-anonymisation past the window. CLI: `sentinai ingest "<query>" --pages 5`, `sentinai compliance`.
+### M1 — Data ingestion (real X posts)
+`ingestion/x_client.py` wraps X API v2 with the expansions needed for author, engagement, reply
+chains (`referenced_tweets`, `conversation_id`) and media (`attachments.media_keys`):
+
+| what you want | dashboard (Ingest from X) | CLI | endpoint used |
+|---|---|---|---|
+| everything matching a query | **Search** tab | `sentinai ingest "(muslims OR islam) lang:en -is:retweet" --pages 3` | `/2/tweets/search/recent` (7-day window); `--full-archive` → `/search/all` with automatic fallback |
+| one post + its thread | **Tweet URL** tab | `sentinai ingest-tweet https://x.com/<user>/status/<id> --conversation` | `/2/tweets`, `conversation_id:` search |
+| an account's timeline | **User timeline** tab | `sentinai ingest-user @handle --pages 3` | `/2/users/by/username`, `/2/users/:id/tweets` |
+| posts as they happen | **Live stream** tab | `sentinai ingest-stream -r "<rule>" --max-minutes 30` | `/2/tweets/search/stream` (+ rules) |
+| files you already have | **Upload file** tab | `sentinai import dump.jsonl archive.zip posts.csv` | – (X API JSON/JSONL, X data archive `tweets.js`/`.zip`, CSV/TSV, plain text) |
+
+Every path ends in the same `IngestionWorker`: parents of replies / quotes / retweets are
+hydrated and processed first (so the stance detector can discount counter-speech), each post is
+preprocessed and classified, bot / account scores are refreshed for the touched authors and
+uncertain posts join the review queue. Per-query `since_id` cursors make re-runs incremental.
+Rate limiting uses the `x-rate-limit-*` headers plus exponential backoff with jitter
+(`SENTINAI_X_BACKOFF_*`); dashboard-triggered pulls stop waiting after
+`SENTINAI_X_API_MAX_WAIT_SECONDS` and report what they got. Long pulls and the stream run as
+background jobs (`GET /api/ingest/jobs`). Access-level errors are translated into actionable
+messages (bad token vs. endpoint not included in the plan). Optional media download
+(`SENTINAI_X_DOWNLOAD_MEDIA` / "download images") stores photos under `data/media` so Module 5 can
+OCR them. Metadata goes to **PostgreSQL/SQLite** (SQLAlchemy), raw JSON to **MongoDB** or the
+relational raw store. `ingestion/compliance.py` implements the X compliance contract (mark posts
+deleted upstream, never re-serve them), GDPR/CCPA-style retention (`SENTINAI_RETENTION_DAYS`) and
+author anonymisation past the window (`sentinai compliance --check-deleted`).
+
+> **X API access (2026):** the official API is pay-per-use; recent search works on every paid
+> plan, while full-archive search and the filtered stream need an upgraded access level. SentinAI
+> defaults to recent search and falls back automatically, and the file importers work with no
+> token at all. The bearer token can be set with `SENTINAI_X_BEARER_TOKEN` or pasted in the
+> dashboard (stored in memory, or under `data/secrets/` with mode 600 when "remember" is ticked).
 
 ### M2 — Preprocessing
 Lowercasing, URL removal, `@mention → @user` anonymisation, hashtag segmentation
@@ -224,7 +246,13 @@ minimum of 50 posts (`SENTINAI_ACCOUNT_MIN_POSTS`) before a score is reported, a
 ### M13 — Dashboard & API
 FastAPI (`/api/docs`) + React/TypeScript SPA (served by the API in production, Vite dev proxy
 in development). JWT auth with three roles; the navigation and routes are gated by permission
-(`read · review · annotate · export · ingest · retrain · audit · manage_users`).
+(`read · review · annotate · export · ingest · retrain · audit · manage_users`). Views: overview,
+target heatmap, temporal trends, propagation graph, post explorer + explainability viewer,
+severity, bots vs humans, account scores, classify playground, human review, fairness audit and
+— for admins — **Ingest from X** (connect a token, search / tweet URL / user timeline / live
+stream / file upload, job monitor, saved cursors). Ingestion endpoints live under
+`/api/ingest/*` (`status`, `x/token`, `x/test`, `x/search`, `x/tweet`, `x/user`,
+`x/stream/{rules,start,stop}`, `upload`, `jobs`, `cursors`).
 
 ### M14 — Human-in-the-loop
 Posts with model confidence in the **0.4–0.6 band** (plus high-severity items) are queued for
@@ -243,7 +271,10 @@ All settings are environment variables prefixed `SENTINAI_` (see `.env.example`)
 |---|---|---|
 | `DATABASE_URL` | `sqlite:///./data/sentinai.db` | metadata DB (`postgresql+psycopg://…` with `[postgres]`) |
 | `RAW_STORE_URL` | JSONL under `DATA_DIR` | `mongodb://…` with `[mongo]` |
-| `X_BEARER_TOKEN` | – | enables live ingestion |
+| `X_BEARER_TOKEN` | – | enables live ingestion (or paste it in the dashboard) |
+| `X_FULL_ARCHIVE` | `false` | prefer `/search/all`; falls back to recent search when not allowed |
+| `X_DOWNLOAD_MEDIA` | `false` | fetch photo attachments into `data/media` for OCR / vision |
+| `X_API_MAX_WAIT_SECONDS` | `45` | max rate-limit wait for dashboard-triggered pulls |
 | `CLASSIFIER_BACKEND` | `heuristic` | `transformer` with `[ml]` + checkpoints |
 | `MODEL_CACHE_DIR` | `models/` | fine-tuned heads, bot model, YOLO weights |
 | `FASTTEXT_LID_PATH` | – | path to `lid.176.bin/ftz` |
@@ -260,7 +291,11 @@ All settings are environment variables prefixed `SENTINAI_` (see `.env.example`)
 sentinai serve                       run the API (+ dashboard if frontend/dist exists)
 sentinai seed --n-posts 1600 --reset (re)generate the demo corpus
 sentinai classify "text"             classify one string with explanation
-sentinai ingest "query" --pages 5    pull from X API v2 into the pipeline
+sentinai ingest "query" --pages 5    search X (recent; --full-archive) into the pipeline
+sentinai ingest-tweet <url|id>...    one or more tweets (+ parent chain, --conversation)
+sentinai ingest-user @handle         a user's timeline
+sentinai ingest-stream -r "<rule>"   filtered stream until Ctrl-C / --max-minutes
+sentinai import <files>...           X API JSON/JSONL, X archive (.zip/tweets.js), CSV, text
 sentinai compliance --check-deleted  retention sweep + upstream deletion sync
 sentinai rescore                     recompute bot and account scores
 sentinai fairness                    print the benchmark fairness report

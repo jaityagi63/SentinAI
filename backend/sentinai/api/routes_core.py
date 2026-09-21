@@ -162,6 +162,7 @@ def _post_dict(post: PostRow, cls: ClassificationRow | None, author: AuthorRow |
         "engagement": {"likes": post.like_count, "retweets": post.retweet_count, "replies": post.reply_count, "quotes": post.quote_count},
         "has_media": post.has_media,
         "media": post.media,
+        "source": post.source,
         "deleted_upstream": post.deleted_upstream,
     }
     if cls:

@@ -348,8 +348,10 @@ def seed(n_posts: int | None = None, seed_value: int | None = None) -> int:
     settings = get_settings()
     init_db()
     posts, events = generate(n_posts or 1600, seed_value if seed_value is not None else settings.demo_seed)
+    for p in posts:
+        p.source = "demo"  # keep the synthetic corpus distinguishable from real X ingestion
     with session_scope() as session:
-        worker = IngestionWorker(session)
+        worker = IngestionWorker(session, download_media=False)
         n = 0
         for i in range(0, len(posts), 200):
             n += worker.process(posts[i : i + 200])
