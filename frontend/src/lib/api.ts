@@ -38,13 +38,19 @@ export function setUnauthorizedHandler(fn: () => void) {
   onUnauthorized = fn;
 }
 
-export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
+/** Auth headers. The token is sent twice on purpose: some reverse proxies / preview tunnels
+ *  rewrite or drop `Authorization`, so the API also accepts `X-SentinAI-Token` (and a cookie). */
+export function authHeaders(): Record<string, string> {
   const session = loadSession();
-  const headers: Record<string, string> = { ...(init.headers as Record<string, string>) };
-  if (session) headers.Authorization = `Bearer ${session.token}`;
+  if (!session) return {};
+  return { Authorization: `Bearer ${session.token}`, "X-SentinAI-Token": session.token };
+}
+
+export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const headers: Record<string, string> = { ...authHeaders(), ...(init.headers as Record<string, string>) };
   if (init.body && !(init.body instanceof FormData)) headers["Content-Type"] = "application/json";
-  const res = await fetch(`/api${path}`, { ...init, headers });
-  if (res.status === 401) {
+  const res = await fetch(`/api${path}`, { credentials: "include", ...init, headers });
+  if (res.status === 401 && !path.startsWith("/auth/login")) {
     onUnauthorized?.();
   }
   if (!res.ok) {
@@ -63,6 +69,7 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 export async function login(username: string, password: string): Promise<Session> {
+  saveSession(null);
   const r = await api<{ access_token: string; role: Role; username: string; permissions: string[] }>("/auth/login", {
     method: "POST",
     body: JSON.stringify({ username, password }),
@@ -72,13 +79,21 @@ export async function login(username: string, password: string): Promise<Session
   return s;
 }
 
+export async function logout(): Promise<void> {
+  try {
+    await api("/auth/logout", { method: "POST" });
+  } catch {
+    /* best effort — the local session is cleared regardless */
+  }
+  saveSession(null);
+}
+
 export function downloadUrl(path: string): string {
   return `/api${path}`;
 }
 
 export async function downloadFile(path: string, filename: string) {
-  const session = loadSession();
-  const res = await fetch(`/api${path}`, { headers: session ? { Authorization: `Bearer ${session.token}` } : {} });
+  const res = await fetch(`/api${path}`, { headers: authHeaders(), credentials: "include" });
   if (!res.ok) throw new ApiError(res.status, res.statusText);
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);

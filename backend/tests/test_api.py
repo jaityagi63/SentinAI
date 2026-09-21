@@ -28,6 +28,34 @@ def test_rbac(client, admin, researcher, moderator):
     assert client.get("/api/auth/me", headers=admin).json()["role"] == "admin"
 
 
+def test_auth_token_transports(client):
+    """The JWT is accepted as bearer header, custom header or cookie (proxies may drop `Authorization`)."""
+    from fastapi.testclient import TestClient
+
+    from sentinai.api.app import app
+
+    with TestClient(app) as fresh:  # isolated cookie jar
+        r = fresh.post("/api/auth/login", json={"username": "moderator", "password": "moderator"})
+        assert r.status_code == 200
+        token = r.json()["access_token"]
+        assert "sentinai_token" in r.cookies  # login also sets the session cookie
+        # 1. cookie only (no header at all)
+        assert fresh.get("/api/auth/me").json()["username"] == "moderator"
+        fresh.cookies.clear()
+        assert fresh.get("/api/auth/me").status_code == 401
+        # 2. custom header only
+        assert fresh.get("/api/auth/me", headers={"X-SentinAI-Token": token}).status_code == 200
+        # 3. a proxy replaced the bearer header with garbage but the custom header survives
+        assert fresh.get("/api/auth/me", headers={"Authorization": "Bearer proxy-injected", "X-SentinAI-Token": token}).status_code == 200
+        # 4. garbage everywhere → 401 (not a 500)
+        assert fresh.get("/api/auth/me", headers={"Authorization": "Bearer nope", "X-SentinAI-Token": "nope"}).status_code == 401
+        # 5. logout clears the cookie
+        fresh.post("/api/auth/login", json={"username": "moderator", "password": "moderator"})
+        assert fresh.get("/api/auth/me").status_code == 200
+        fresh.post("/api/auth/logout")
+        assert fresh.get("/api/auth/me").status_code == 401
+
+
 def test_dashboard_endpoints(client, admin):
     o = client.get("/api/analytics/overview?days=90", headers=admin).json()
     assert o["posts"] > 0 and o["toxic_posts"] > 0 and set(o["by_severity"]) >= {0, 2, 3, 4} or set(map(str, o["by_severity"])) >= {"0", "2"}

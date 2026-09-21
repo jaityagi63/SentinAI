@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 import bcrypt
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -17,6 +17,12 @@ from sentinai.storage.db import get_session
 from sentinai.storage.models import UserRow
 
 _bearer = HTTPBearer(auto_error=False)
+
+# Some reverse proxies / preview tunnels consume or rewrite the ``Authorization`` header before
+# the request reaches the API.  The dashboard therefore also sends the token in a custom header,
+# and the API additionally accepts a cookie set at login.  All three carry the same JWT.
+TOKEN_HEADER = "X-SentinAI-Token"
+TOKEN_COOKIE = "sentinai_token"
 
 # Capability matrix — what each role may do.
 PERMISSIONS: dict[str, set[str]] = {
@@ -57,16 +63,41 @@ class CurrentUser:
         return perm in PERMISSIONS.get(self.role, set())
 
 
-def get_current_user(creds: HTTPAuthorizationCredentials | None = Depends(_bearer)) -> CurrentUser:
-    if creds is None:
+def candidate_tokens(request: Request, creds: HTTPAuthorizationCredentials | None) -> list[str]:
+    """Tokens presented by the client, in order of preference (bearer header, custom header, cookie)."""
+    out: list[str] = []
+    if creds is not None and creds.credentials:
+        out.append(creds.credentials.strip())
+    alt = request.headers.get(TOKEN_HEADER)
+    if alt and alt.strip() not in out:
+        out.append(alt.strip())
+    cookie = request.cookies.get(TOKEN_COOKIE)
+    if cookie and cookie not in out:
+        out.append(cookie)
+    return out
+
+
+def get_current_user(request: Request, creds: HTTPAuthorizationCredentials | None = Depends(_bearer)) -> CurrentUser:
+    tokens = candidate_tokens(request, creds)
+    if not tokens:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Missing bearer token", headers={"WWW-Authenticate": "Bearer"})
-    try:
-        data = decode_token(creds.credentials)
-    except jwt.ExpiredSignatureError as exc:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Token expired") from exc
-    except jwt.PyJWTError as exc:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid token") from exc
-    return CurrentUser(data["sub"], data.get("role", Role.RESEARCHER.value))
+    error = "Invalid token"
+    for token in tokens:  # a proxy may have replaced the bearer header — fall through to the alternatives
+        try:
+            data = decode_token(token)
+        except jwt.ExpiredSignatureError:
+            error = "Token expired"
+            continue
+        except jwt.PyJWTError:
+            continue
+        return CurrentUser(data["sub"], data.get("role", Role.RESEARCHER.value))
+    raise HTTPException(status.HTTP_401_UNAUTHORIZED, error, headers={"WWW-Authenticate": "Bearer"})
+
+
+def session_cookie_params(request: Request) -> dict:
+    """Cookie attributes that work both on plain http (dev) and behind an https proxy / in an iframe."""
+    secure = request.url.scheme == "https" or request.headers.get("x-forwarded-proto", "").split(",")[0].strip() == "https"
+    return {"key": TOKEN_COOKIE, "httponly": True, "secure": secure, "samesite": "none" if secure else "lax", "path": "/", "max_age": get_settings().jwt_expire_minutes * 60}
 
 
 def require(perm: str):
@@ -96,4 +127,4 @@ def bootstrap_users(session: Session) -> int:
     return len(defaults)
 
 
-__all__ = ["CurrentUser", "PERMISSIONS", "authenticate", "bootstrap_users", "create_token", "get_current_user", "get_session", "require"]
+__all__ = ["CurrentUser", "PERMISSIONS", "TOKEN_COOKIE", "TOKEN_HEADER", "authenticate", "bootstrap_users", "candidate_tokens", "create_token", "get_current_user", "get_session", "require", "session_cookie_params"]

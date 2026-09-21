@@ -46,6 +46,7 @@ def client(seeded_db):
 def _token(client, username, password):
     r = client.post("/api/auth/login", json={"username": username, "password": password})
     assert r.status_code == 200, r.text
+    client.cookies.clear()  # tests exercise RBAC via explicit headers; keep the shared jar anonymous
     return {"Authorization": f"Bearer {r.json()['access_token']}"}
 
 

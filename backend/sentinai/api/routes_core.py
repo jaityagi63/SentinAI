@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from sentinai import __version__
 from sentinai.api.schemas import ClassifyRequest, ClassifyResponse, IngestBatchRequest, LoginRequest, TokenResponse
-from sentinai.auth import PERMISSIONS, CurrentUser, authenticate, create_token, get_current_user, require
+from sentinai.auth import PERMISSIONS, TOKEN_COOKIE, CurrentUser, authenticate, create_token, get_current_user, require, session_cookie_params
 from sentinai.classification.context import ParentInfo
 from sentinai.classification.engine import get_engine
 from sentinai.config import get_settings
@@ -68,11 +68,20 @@ def taxonomy():
 
 
 @router.post("/auth/login", response_model=TokenResponse, tags=["auth"])
-def login(body: LoginRequest, session: Session = Depends(get_session)):
+def login(body: LoginRequest, request: Request, response: Response, session: Session = Depends(get_session)):
     user = authenticate(session, body.username, body.password)
     if user is None:
-        raise HTTPException(401, "Invalid credentials")
-    return TokenResponse(access_token=create_token(user.username, user.role), role=user.role, username=user.username, permissions=sorted(PERMISSIONS[user.role]))
+        raise HTTPException(401, "Invalid username or password")
+    token = create_token(user.username, user.role)
+    # Belt and braces: the SPA sends the token as a header; the cookie covers clients/proxies that drop it.
+    response.set_cookie(value=token, **session_cookie_params(request))
+    return TokenResponse(access_token=token, role=user.role, username=user.username, permissions=sorted(PERMISSIONS[user.role]))
+
+
+@router.post("/auth/logout", tags=["auth"])
+def logout(response: Response):
+    response.delete_cookie(TOKEN_COOKIE, path="/")
+    return {"ok": True}
 
 
 @router.get("/auth/me", tags=["auth"])

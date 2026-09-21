@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, NavLink, Route, Routes, useNavigate } from "react-router-dom";
-import { loadSession, saveSession, setUnauthorizedHandler, type Session } from "./lib/api";
+import { loadSession, logout, saveSession, setUnauthorizedHandler, type Session } from "./lib/api";
 import LoginPage from "./pages/Login";
 import OverviewPage from "./pages/Overview";
 import HeatmapPage from "./pages/Heatmap";
@@ -88,18 +88,32 @@ function Shell({ session, onLogout }: { session: Session; onLogout: () => void }
 
 function Root() {
   const [session, setSession] = useState<Session | null>(() => loadSession());
+  const [notice, setNotice] = useState<string | null>(null);
   const navigate = useNavigate();
   useEffect(() => {
     setUnauthorizedHandler(() => {
       saveSession(null);
       setSession(null);
+      setNotice("Your session expired or was rejected by the server — please sign in again.");
       navigate("/login");
     });
   }, [navigate]);
   if (!session) {
     return (
       <Routes>
-        <Route path="*" element={<LoginPage onLogin={(s) => setSession(s)} />} />
+        <Route
+          path="*"
+          element={
+            <LoginPage
+              notice={notice}
+              onLogin={(s) => {
+                setNotice(null);
+                setSession(s);
+                navigate("/");
+              }}
+            />
+          }
+        />
       </Routes>
     );
   }
@@ -107,8 +121,9 @@ function Root() {
     <Shell
       session={session}
       onLogout={() => {
-        saveSession(null);
+        void logout();
         setSession(null);
+        navigate("/");
       }}
     />
   );
