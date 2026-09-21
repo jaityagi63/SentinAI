@@ -1,0 +1,85 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sentinai"
+version = "0.1.0"
+description = "SentinAI — Social Media Bias & Hate Speech Intelligence Platform (backend)"
+readme = "../README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "sqlalchemy>=2.0",
+    "httpx>=0.27",
+    "numpy>=1.26",
+    "pandas>=2.2",
+    "scikit-learn>=1.4",
+    "statsmodels>=0.14",
+    "networkx>=3.2",
+    "datasketch>=1.6",
+    "emoji>=2.10",
+    "wordninja>=2.0",
+    "pyyaml>=6.0",
+    "PyJWT>=2.8",
+    "bcrypt>=4.1",
+    "python-multipart>=0.0.9",
+    "reportlab>=4.1",
+    "typer>=0.12",
+]
+
+[project.optional-dependencies]
+# Transformer classifiers (DeBERTa-v3 / HateBERT / XLM-R / mDeBERTa) + SHAP / LIME + FastText LID
+ml = [
+    "torch>=2.2",
+    "transformers>=4.40",
+    "sentencepiece>=0.2",
+    "shap>=0.45",
+    "lime>=0.2",
+    "fasttext-wheel>=0.9.2",
+    "indic-transliteration>=2.3",
+]
+# OCR + vision-language + hate-symbol detection
+vision = [
+    "Pillow>=10.0",
+    "pytesseract>=0.3.10",
+    "easyocr>=1.7",
+    "open_clip_torch>=2.24",
+    "ultralytics>=8.1",
+]
+forecast = ["prophet>=1.1"]
+postgres = ["psycopg[binary]>=3.1"]
+mongo = ["pymongo>=4.6"]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.4",
+    "mypy>=1.9",
+]
+
+[project.scripts]
+sentinai = "sentinai.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sentinai*"]
+
+[tool.setuptools.package-data]
+sentinai = ["resources/**/*.yaml", "resources/**/*.json", "resources/**/*.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+filterwarnings = ["ignore::DeprecationWarning", "ignore::FutureWarning"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "B008"]

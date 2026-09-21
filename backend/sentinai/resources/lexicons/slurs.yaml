@@ -1,0 +1,288 @@
+# Slur lexicon — Task C level 3 ("Slurs / Targeted Harassment") and Task B evidence.
+#
+# CONTENT WARNING: this file contains real ethnic, religious and nationality slurs.  It exists
+# solely so the detector can recognise them; it is loaded by sentinai.classification.lexicon
+# and never rendered in the UI except as the flagged span of a post under review.
+#
+# Format:  <term>: { category: ethnicity|religion|nationality, label: <target label>,
+#                    weight: 0-1 (harassment contribution), ambiguous: bool (optional) }
+#
+# `ambiguous: true` marks terms with a common benign sense (e.g. a word that is also an
+# ordinary noun).  Ambiguous terms only score when hostile context is present in the same post.
+#
+# In production this file is intended to be replaced / augmented by a licensed lexicon
+# (e.g. Hatebase, The Weaponized Word) via `LexiconLoader.extend()`.  Matching is on the
+# de-obfuscated, lower-cased text so leetspeak / homoglyph / spaced-out variants also match.
+
+# --- ethnicity ------------------------------------------------------------------------------
+nigger:      { category: ethnicity, label: black, weight: 1.0 }
+niggers:     { category: ethnicity, label: black, weight: 1.0 }
+nigga:       { category: ethnicity, label: black, weight: 0.55, ambiguous: true }  # in-group / AAVE usage is common — see Module 11
+niggas:      { category: ethnicity, label: black, weight: 0.55, ambiguous: true }
+negro:       { category: ethnicity, label: black, weight: 0.5, ambiguous: true }   # neutral demonym in es/pt
+negroes:     { category: ethnicity, label: black, weight: 0.7 }
+coon:        { category: ethnicity, label: black, weight: 0.8, ambiguous: true }
+coons:       { category: ethnicity, label: black, weight: 0.85 }
+darkie:      { category: ethnicity, label: black, weight: 0.9 }
+darkies:     { category: ethnicity, label: black, weight: 0.9 }
+porch monkey: { category: ethnicity, label: black, weight: 1.0 }
+jigaboo:     { category: ethnicity, label: black, weight: 1.0 }
+spook:       { category: ethnicity, label: black, weight: 0.4, ambiguous: true }
+kaffir:      { category: ethnicity, label: black, weight: 0.9 }
+kafir:       { category: religion, label: islam, weight: 0.3, ambiguous: true }    # Arabic "unbeliever" — hostile only in context
+kalu:        { category: ethnicity, label: black, weight: 0.6, ambiguous: true }    # hi romanized
+kaliya:      { category: ethnicity, label: black, weight: 0.6, ambiguous: true }    # hi romanized
+habshi:      { category: ethnicity, label: black, weight: 0.8 }                     # hi/ur
+हब्शी:        { category: ethnicity, label: black, weight: 0.8 }
+عبد:          { category: ethnicity, label: black, weight: 0.3, ambiguous: true }    # ar "slave" — slur only when aimed at Black people
+عبيد:         { category: ethnicity, label: black, weight: 0.5, ambiguous: true }
+3abd:        { category: ethnicity, label: black, weight: 0.3, ambiguous: true }
+chink:       { category: ethnicity, label: asian, weight: 1.0, ambiguous: true }   # also "a chink in the armour"
+chinks:      { category: ethnicity, label: asian, weight: 1.0 }
+chinky:      { category: ethnicity, label: asian, weight: 0.9 }
+gook:        { category: ethnicity, label: asian, weight: 1.0 }
+gooks:       { category: ethnicity, label: asian, weight: 1.0 }
+slant eye:   { category: ethnicity, label: asian, weight: 0.9 }
+slant eyes:  { category: ethnicity, label: asian, weight: 0.9 }
+slant-eyed:  { category: ethnicity, label: asian, weight: 0.9 }
+zipperhead:  { category: ethnicity, label: asian, weight: 1.0 }
+ching chong: { category: ethnicity, label: asian, weight: 0.9 }
+chingchong:  { category: ethnicity, label: asian, weight: 0.9 }
+chino:       { category: ethnicity, label: asian, weight: 0.2, ambiguous: true }    # es neutral demonym
+chinki:      { category: ethnicity, label: asian, weight: 0.9 }                     # hi romanized (aimed at NE Indians / East Asians)
+chinky:      { category: ethnicity, label: asian, weight: 0.9 }
+चिंकी:        { category: ethnicity, label: asian, weight: 0.9 }
+spic:        { category: ethnicity, label: hispanic_latino, weight: 1.0 }
+spics:       { category: ethnicity, label: hispanic_latino, weight: 1.0 }
+spick:       { category: ethnicity, label: hispanic_latino, weight: 1.0 }
+spik:        { category: ethnicity, label: hispanic_latino, weight: 0.9 }
+beaner:      { category: ethnicity, label: hispanic_latino, weight: 1.0 }
+beaners:     { category: ethnicity, label: hispanic_latino, weight: 1.0 }
+wetback:     { category: nationality, label: mexican, weight: 1.0 }
+wetbacks:    { category: nationality, label: mexican, weight: 1.0 }
+greaser:     { category: ethnicity, label: hispanic_latino, weight: 0.5, ambiguous: true }
+sudaca:      { category: ethnicity, label: hispanic_latino, weight: 0.9 }           # es (Spain)
+sudacas:     { category: ethnicity, label: hispanic_latino, weight: 0.9 }
+redskin:     { category: ethnicity, label: indigenous, weight: 0.8, ambiguous: true }
+redskins:    { category: ethnicity, label: indigenous, weight: 0.7, ambiguous: true }
+injun:       { category: ethnicity, label: indigenous, weight: 0.9 }
+injuns:      { category: ethnicity, label: indigenous, weight: 0.9 }
+squaw:       { category: ethnicity, label: indigenous, weight: 0.8 }
+prairie nigger: { category: ethnicity, label: indigenous, weight: 1.0 }
+abo:         { category: ethnicity, label: indigenous, weight: 0.7, ambiguous: true }
+abos:        { category: ethnicity, label: indigenous, weight: 0.85 }
+sand nigger: { category: ethnicity, label: middle_eastern, weight: 1.0 }
+sand niggers: { category: ethnicity, label: middle_eastern, weight: 1.0 }
+towelhead:   { category: ethnicity, label: middle_eastern, weight: 1.0 }
+towelheads:  { category: ethnicity, label: middle_eastern, weight: 1.0 }
+towel head:  { category: ethnicity, label: middle_eastern, weight: 1.0 }
+raghead:     { category: ethnicity, label: middle_eastern, weight: 1.0 }
+ragheads:    { category: ethnicity, label: middle_eastern, weight: 1.0 }
+rag head:    { category: ethnicity, label: middle_eastern, weight: 1.0 }
+camel jockey: { category: ethnicity, label: middle_eastern, weight: 1.0 }
+camel jockeys: { category: ethnicity, label: middle_eastern, weight: 1.0 }
+camel fucker: { category: ethnicity, label: middle_eastern, weight: 1.0 }
+hajji:       { category: ethnicity, label: middle_eastern, weight: 0.4, ambiguous: true }  # honorific in Arabic; slur in US military slang
+haji:        { category: ethnicity, label: middle_eastern, weight: 0.4, ambiguous: true }
+bougnoule:   { category: ethnicity, label: middle_eastern, weight: 1.0 }            # fr
+bougnoules:  { category: ethnicity, label: middle_eastern, weight: 1.0 }
+bicot:       { category: ethnicity, label: middle_eastern, weight: 1.0 }            # fr
+bicots:      { category: ethnicity, label: middle_eastern, weight: 1.0 }
+crouille:    { category: ethnicity, label: middle_eastern, weight: 1.0 }            # fr
+moro:        { category: ethnicity, label: middle_eastern, weight: 0.5, ambiguous: true }  # es
+moros:       { category: ethnicity, label: middle_eastern, weight: 0.6, ambiguous: true }
+kanake:      { category: ethnicity, label: middle_eastern, weight: 0.9 }            # de
+kanaken:     { category: ethnicity, label: middle_eastern, weight: 0.9 }
+kanacke:     { category: ethnicity, label: middle_eastern, weight: 0.9 }
+kanacken:    { category: ethnicity, label: middle_eastern, weight: 0.9 }
+paki:        { category: nationality, label: pakistani, weight: 0.95 }
+pakis:       { category: nationality, label: pakistani, weight: 1.0 }
+paky:        { category: nationality, label: pakistani, weight: 0.95 }
+curry muncher: { category: ethnicity, label: south_asian, weight: 1.0 }
+curry munchers: { category: ethnicity, label: south_asian, weight: 1.0 }
+dothead:     { category: ethnicity, label: south_asian, weight: 1.0 }
+dotheads:    { category: ethnicity, label: south_asian, weight: 1.0 }
+pajeet:      { category: ethnicity, label: south_asian, weight: 1.0 }
+pajeets:     { category: ethnicity, label: south_asian, weight: 1.0 }
+street shitter: { category: ethnicity, label: south_asian, weight: 1.0 }
+street shitters: { category: ethnicity, label: south_asian, weight: 1.0 }
+cracker:     { category: ethnicity, label: white, weight: 0.4, ambiguous: true }
+crackers:    { category: ethnicity, label: white, weight: 0.3, ambiguous: true }
+honky:       { category: ethnicity, label: white, weight: 0.8 }
+honkey:      { category: ethnicity, label: white, weight: 0.8 }
+honkies:     { category: ethnicity, label: white, weight: 0.8 }
+whitey:      { category: ethnicity, label: white, weight: 0.6 }
+gringo:      { category: ethnicity, label: white, weight: 0.3, ambiguous: true }
+gringos:     { category: ethnicity, label: white, weight: 0.3, ambiguous: true }
+gora:        { category: ethnicity, label: white, weight: 0.2, ambiguous: true }    # hi neutral-ish
+gore:        { category: ethnicity, label: white, weight: 0.1, ambiguous: true }
+gypsy:       { category: ethnicity, label: roma, weight: 0.4, ambiguous: true }
+gypsies:     { category: ethnicity, label: roma, weight: 0.5, ambiguous: true }
+gyppo:       { category: ethnicity, label: roma, weight: 0.9 }
+gyppos:      { category: ethnicity, label: roma, weight: 0.9 }
+pikey:       { category: ethnicity, label: roma, weight: 0.9 }
+pikeys:      { category: ethnicity, label: roma, weight: 0.9 }
+zigeuner:    { category: ethnicity, label: roma, weight: 0.7 }                      # de
+zigeunerin:  { category: ethnicity, label: roma, weight: 0.7 }
+gitano:      { category: ethnicity, label: roma, weight: 0.2, ambiguous: true }     # es (self-designation)
+half-breed:  { category: ethnicity, label: indigenous, weight: 0.8 }
+halfbreed:   { category: ethnicity, label: indigenous, weight: 0.8 }
+half breed:  { category: ethnicity, label: indigenous, weight: 0.8 }
+mulatto:     { category: ethnicity, label: black, weight: 0.5, ambiguous: true }
+mongoloid:   { category: ethnicity, label: asian, weight: 0.8 }
+oriental:    { category: ethnicity, label: asian, weight: 0.3, ambiguous: true }
+orientals:   { category: ethnicity, label: asian, weight: 0.5, ambiguous: true }
+jap:         { category: nationality, label: japanese, weight: 0.85, ambiguous: true }
+japs:        { category: nationality, label: japanese, weight: 0.95 }
+nip:         { category: nationality, label: japanese, weight: 0.3, ambiguous: true }
+nips:        { category: nationality, label: japanese, weight: 0.4, ambiguous: true }
+chinaman:    { category: nationality, label: chinese, weight: 0.9 }
+chinamen:    { category: nationality, label: chinese, weight: 0.9 }
+chink-a-billy: { category: ethnicity, label: asian, weight: 1.0 }
+bamboo coon: { category: ethnicity, label: asian, weight: 1.0 }
+kraut:       { category: nationality, label: german, weight: 0.7, ambiguous: true }
+krauts:      { category: nationality, label: german, weight: 0.8 }
+frog:        { category: nationality, label: french, weight: 0.1, ambiguous: true }
+frogs:       { category: nationality, label: french, weight: 0.1, ambiguous: true }
+polack:      { category: nationality, label: polish, weight: 0.9 }
+polacks:     { category: nationality, label: polish, weight: 0.9 }
+polak:       { category: nationality, label: polish, weight: 0.7, ambiguous: true } # neutral in de/pl contexts
+wop:         { category: nationality, label: italian, weight: 0.9 }
+wops:        { category: nationality, label: italian, weight: 0.9 }
+dago:        { category: nationality, label: italian, weight: 0.9 }
+dagos:       { category: nationality, label: italian, weight: 0.9 }
+mick:        { category: nationality, label: irish, weight: 0.3, ambiguous: true }
+micks:       { category: nationality, label: irish, weight: 0.5, ambiguous: true }
+flip:        { category: nationality, label: filipino, weight: 0.1, ambiguous: true }
+flips:       { category: nationality, label: filipino, weight: 0.2, ambiguous: true }
+russki:      { category: nationality, label: russian, weight: 0.6 }
+ruskie:      { category: nationality, label: russian, weight: 0.6 }
+ruskies:     { category: nationality, label: russian, weight: 0.7 }
+katsap:      { category: nationality, label: russian, weight: 0.8 }
+moskal:      { category: nationality, label: russian, weight: 0.8 }
+khokhol:     { category: nationality, label: ukrainian, weight: 0.9 }
+khokhols:    { category: nationality, label: ukrainian, weight: 0.9 }
+ukrop:       { category: nationality, label: ukrainian, weight: 0.8, ambiguous: true }
+bangla:      { category: nationality, label: bangladeshi, weight: 0.2, ambiguous: true }
+bangladeshi ghuspaithiye: { category: nationality, label: bangladeshi, weight: 0.9 }
+bihari:      { category: nationality, label: indian, weight: 0.1, ambiguous: true }
+madrasi:     { category: nationality, label: indian, weight: 0.5, ambiguous: true } # hi, derogatory for South Indians
+bhaiya:      { category: nationality, label: indian, weight: 0.1, ambiguous: true }
+chapta:      { category: ethnicity, label: asian, weight: 0.8 }                     # hi ("flat-faced")
+चपटा:         { category: ethnicity, label: asian, weight: 0.8 }
+nepali kancha: { category: nationality, label: nepali, weight: 0.8 }
+bahadur:     { category: nationality, label: nepali, weight: 0.2, ambiguous: true }
+malaun:      { category: religion, label: hinduism, weight: 1.0 }                   # bn/ur
+malaon:      { category: religion, label: hinduism, weight: 1.0 }
+
+# --- religion --------------------------------------------------------------------------------
+kike:        { category: religion, label: judaism, weight: 1.0 }
+kikes:       { category: religion, label: judaism, weight: 1.0 }
+kyke:        { category: religion, label: judaism, weight: 1.0 }
+heeb:        { category: religion, label: judaism, weight: 0.9 }
+heebs:       { category: religion, label: judaism, weight: 0.9 }
+hebe:        { category: religion, label: judaism, weight: 0.7, ambiguous: true }
+yid:         { category: religion, label: judaism, weight: 0.7, ambiguous: true }   # reclaimed by some football fans
+yids:        { category: religion, label: judaism, weight: 0.8, ambiguous: true }
+hymie:       { category: religion, label: judaism, weight: 0.9 }
+hymies:      { category: religion, label: judaism, weight: 0.9 }
+sheeny:      { category: religion, label: judaism, weight: 0.9 }
+christ killer: { category: religion, label: judaism, weight: 1.0 }
+christ killers: { category: religion, label: judaism, weight: 1.0 }
+zog:         { category: religion, label: judaism, weight: 0.9 }
+zionist pig: { category: religion, label: judaism, weight: 0.95 }
+zionist pigs: { category: religion, label: judaism, weight: 0.95 }
+"(((":       { category: religion, label: judaism, weight: 0.85 }                  # echo brackets
+youpin:      { category: religion, label: judaism, weight: 1.0 }                    # fr
+youpins:     { category: religion, label: judaism, weight: 1.0 }
+feuj:        { category: religion, label: judaism, weight: 0.6, ambiguous: true }   # fr verlan
+judío de mierda: { category: religion, label: judaism, weight: 1.0 }
+judenschwein: { category: religion, label: judaism, weight: 1.0 }                  # de
+judensau:    { category: religion, label: judaism, weight: 1.0 }
+drecksjude:  { category: religion, label: judaism, weight: 1.0 }
+drecksjuden: { category: religion, label: judaism, weight: 1.0 }
+يهود الخنازير: { category: religion, label: judaism, weight: 1.0 }
+أحفاد القردة والخنازير: { category: religion, label: judaism, weight: 1.0 }
+احفاد القردة والخنازير: { category: religion, label: judaism, weight: 1.0 }
+a7fad el 2erada: { category: religion, label: judaism, weight: 1.0 }
+muzzie:      { category: religion, label: islam, weight: 1.0 }
+muzzies:     { category: religion, label: islam, weight: 1.0 }
+muzrat:      { category: religion, label: islam, weight: 1.0 }
+muzrats:     { category: religion, label: islam, weight: 1.0 }
+muzlim:      { category: religion, label: islam, weight: 0.6 }
+mudslime:    { category: religion, label: islam, weight: 1.0 }
+mudslimes:   { category: religion, label: islam, weight: 1.0 }
+moslem scum: { category: religion, label: islam, weight: 1.0 }
+islamist scum: { category: religion, label: islam, weight: 0.9 }
+goat fucker: { category: religion, label: islam, weight: 1.0 }
+goat fuckers: { category: religion, label: islam, weight: 1.0 }
+goatfucker:  { category: religion, label: islam, weight: 1.0 }
+terrorist religion: { category: religion, label: islam, weight: 0.9 }
+paedo prophet: { category: religion, label: islam, weight: 0.9 }
+pedo prophet: { category: religion, label: islam, weight: 0.9 }
+katua:       { category: religion, label: islam, weight: 1.0 }                      # hi
+katue:       { category: religion, label: islam, weight: 1.0 }
+katwa:       { category: religion, label: islam, weight: 1.0 }
+katwe:       { category: religion, label: islam, weight: 1.0 }
+कटुआ:         { category: religion, label: islam, weight: 1.0 }
+कटुए:         { category: religion, label: islam, weight: 1.0 }
+कटवा:         { category: religion, label: islam, weight: 1.0 }
+mulla:       { category: religion, label: islam, weight: 0.4, ambiguous: true }
+mulle:       { category: religion, label: islam, weight: 0.8 }                      # hi derogatory plural
+मुल्ले:        { category: religion, label: islam, weight: 0.8 }
+sulla:       { category: religion, label: islam, weight: 1.0 }                      # hi
+sulle:       { category: religion, label: islam, weight: 1.0 }
+सुल्ला:        { category: religion, label: islam, weight: 1.0 }
+सुल्ले:        { category: religion, label: islam, weight: 1.0 }
+jihadi:      { category: religion, label: islam, weight: 0.5, ambiguous: true }
+jihadis:     { category: religion, label: islam, weight: 0.6, ambiguous: true }
+jihadists:   { category: religion, label: islam, weight: 0.4, ambiguous: true }
+bhakt:       { category: religion, label: hinduism, weight: 0.3, ambiguous: true }  # hi political pejorative
+andhbhakt:   { category: religion, label: hinduism, weight: 0.5, ambiguous: true }
+sanghi:      { category: religion, label: hinduism, weight: 0.4, ambiguous: true }
+sanghis:     { category: religion, label: hinduism, weight: 0.5, ambiguous: true }
+cow piss drinker: { category: religion, label: hinduism, weight: 1.0 }
+cow piss drinkers: { category: religion, label: hinduism, weight: 1.0 }
+gaumutra drinker: { category: religion, label: hinduism, weight: 0.9 }
+kaffir hindu: { category: religion, label: hinduism, weight: 1.0 }
+hindutva terrorist: { category: religion, label: hinduism, weight: 0.7, ambiguous: true }
+idol worshipper: { category: religion, label: hinduism, weight: 0.5, ambiguous: true }
+idol worshippers: { category: religion, label: hinduism, weight: 0.5, ambiguous: true }
+mushrik:     { category: religion, label: hinduism, weight: 0.5, ambiguous: true }
+mushrikeen:  { category: religion, label: hinduism, weight: 0.5, ambiguous: true }
+raghead sikh: { category: religion, label: sikhism, weight: 1.0 }
+santa banta: { category: religion, label: sikhism, weight: 0.3, ambiguous: true }
+sardarji joke: { category: religion, label: sikhism, weight: 0.4, ambiguous: true }
+bible thumper: { category: religion, label: christianity, weight: 0.6 }
+bible thumpers: { category: religion, label: christianity, weight: 0.6 }
+bible basher: { category: religion, label: christianity, weight: 0.6 }
+christ-tard: { category: religion, label: christianity, weight: 0.9 }
+xtian:       { category: religion, label: christianity, weight: 0.4, ambiguous: true }
+papist:      { category: religion, label: christianity, weight: 0.6 }
+papists:     { category: religion, label: christianity, weight: 0.7 }
+fenian:      { category: religion, label: christianity, weight: 0.6, ambiguous: true }
+fenians:     { category: religion, label: christianity, weight: 0.7, ambiguous: true }
+taig:        { category: religion, label: christianity, weight: 0.9 }
+taigs:       { category: religion, label: christianity, weight: 0.9 }
+prod:        { category: religion, label: christianity, weight: 0.1, ambiguous: true }
+crusader scum: { category: religion, label: christianity, weight: 0.9 }
+salibi:      { category: religion, label: christianity, weight: 0.5, ambiguous: true }   # ar "crusader" pejorative
+صليبي:        { category: religion, label: christianity, weight: 0.5, ambiguous: true }
+صليبيين:      { category: religion, label: christianity, weight: 0.6, ambiguous: true }
+نصارى:        { category: religion, label: christianity, weight: 0.3, ambiguous: true }
+nasara:      { category: religion, label: christianity, weight: 0.3, ambiguous: true }
+rafidi:      { category: religion, label: islam, weight: 0.9 }                      # ar sectarian (anti-Shia)
+rafida:      { category: religion, label: islam, weight: 0.9 }
+rawafid:     { category: religion, label: islam, weight: 0.9 }
+روافض:        { category: religion, label: islam, weight: 0.9 }
+رافضي:        { category: religion, label: islam, weight: 0.9 }
+رافضة:        { category: religion, label: islam, weight: 0.9 }
+majoos:      { category: religion, label: islam, weight: 0.8 }                      # ar sectarian (anti-Shia / anti-Iranian)
+majus:       { category: religion, label: islam, weight: 0.8 }
+مجوس:         { category: religion, label: islam, weight: 0.8 }
+nawasib:     { category: religion, label: islam, weight: 0.9 }                      # ar sectarian (anti-Sunni)
+nasibi:      { category: religion, label: islam, weight: 0.9 }
+نواصب:        { category: religion, label: islam, weight: 0.9 }
+ناصبي:        { category: religion, label: islam, weight: 0.9 }
+wahabi dogs: { category: religion, label: islam, weight: 1.0 }
+"وهابية كلاب": { category: religion, label: islam, weight: 1.0 }

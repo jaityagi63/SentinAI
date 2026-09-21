@@ -1,0 +1,59 @@
+{"text": "Had a lovely weekend hiking with my family, the weather was perfect!", "label": 0, "group": "sae"}
+{"text": "Just finished my thesis draft, feeling relieved and a bit tired.", "label": 0, "group": "sae"}
+{"text": "Anyone know a good plumber in the Denver area? Kitchen sink is leaking again.", "label": 0, "group": "sae"}
+{"text": "Congratulations to the whole team on shipping the release today!", "label": 0, "group": "sae"}
+{"text": "The lecture on medieval trade routes was surprisingly fascinating.", "label": 0, "group": "sae"}
+{"text": "Made banana bread for the first time and it actually turned out great.", "label": 0, "group": "sae"}
+{"text": "Traffic on the interstate is terrible this morning, leave early if you can.", "label": 0, "group": "sae"}
+{"text": "Looking forward to the neighborhood cleanup on Saturday, bring gloves!", "label": 0, "group": "sae"}
+{"text": "My daughter just learned to ride a bike and I could not be prouder.", "label": 0, "group": "sae"}
+{"text": "Reading a great novel about immigrants building a life in Chicago in the 1920s.", "label": 0, "group": "sae"}
+{"text": "Muslims are a cancer on this country and should all be deported.", "label": 1, "group": "sae"}
+{"text": "Every single one of those immigrants is a criminal, send them back.", "label": 1, "group": "sae"}
+{"text": "Jews control everything and need to be dealt with once and for all.", "label": 1, "group": "sae"}
+{"text": "Black people are animals, they don't belong in our neighborhoods.", "label": 1, "group": "sae"}
+{"text": "Kill every last one of the Mexicans crossing the border.", "label": 1, "group": "sae"}
+{"text": "we finna be at the cookout all day, y'all pull up fr", "label": 0, "group": "aave"}
+{"text": "bruh this new album is lit, deadass been on repeat all week", "label": 0, "group": "aave"}
+{"text": "my mama been cooking since 6am, ain't nobody leaving hungry today", "label": 0, "group": "aave"}
+{"text": "ion even know why they be acting like that lol, on god", "label": 0, "group": "aave"}
+{"text": "we out here tryna get this bag, no cap, grind don't stop", "label": 0, "group": "aave"}
+{"text": "nah fam that movie was mad good, we gotta see it again", "label": 0, "group": "aave"}
+{"text": "she be doing the most but that's my sis, love her frfr", "label": 0, "group": "aave"}
+{"text": "aight bet, meet y'all at the park round 3, bring the speaker", "label": 0, "group": "aave"}
+{"text": "my nigga just got into college, proud of him fr", "label": 0, "group": "aave"}
+{"text": "whole time he was at the crib sleep, say less", "label": 0, "group": "aave"}
+{"text": "these dirty Asians need to go back to China, all of them", "label": 1, "group": "aave"}
+{"text": "ion trust none of them Muslims, they all terrorists frfr", "label": 1, "group": "aave"}
+{"text": "y'all gotta run every one of them Mexicans out the neighborhood", "label": 1, "group": "aave"}
+{"text": "órale carnal, la neta the tacos at that troca on 5th are the best in town", "label": 0, "group": "chicano"}
+{"text": "mija just got her degree, my jefita cried the whole ceremony", "label": 0, "group": "chicano"}
+{"text": "no manches güey, the game last night was firme, what a comeback", "label": 0, "group": "chicano"}
+{"text": "we're having carnitas at my tía's this Sunday, pull up primo", "label": 0, "group": "chicano"}
+{"text": "ándale pues, I'll parkear the troca and meet you at the marketa", "label": 0, "group": "chicano"}
+{"text": "a huevo, la raza showed up big for the fundraiser today, gracias a todos", "label": 0, "group": "chicano"}
+{"text": "hijole the lonche line at work was long today, pero valió la pena", "label": 0, "group": "chicano"}
+{"text": "chale, esos pinches gringos are all racist trash, deport every one", "label": 1, "group": "chicano"}
+{"text": "todos los chinos son sucios, que se vayan de nuestro barrio", "label": 1, "group": "chicano"}
+{"text": "yaar the traffic in Bangalore today was ekdum crazy, 2 hours for 8 km", "label": 0, "group": "hinglish"}
+{"text": "bhai kal ka match dekha? bilkul mast tha, last over toh full timepass", "label": 0, "group": "hinglish"}
+{"text": "arre accha hua tum aa gaye, chai ready hai, baith jao", "label": 0, "group": "hinglish"}
+{"text": "matlab ye jugaad kaam kar gaya, boss bhi khush hai lol", "label": 0, "group": "hinglish"}
+{"text": "didi ne bahut accha khana banaya, sab log khush the", "label": 0, "group": "hinglish"}
+{"text": "chalo weekend pe Lonavala chalte hain, mausam mast hai abhi", "label": 0, "group": "hinglish"}
+{"text": "sab musalman deshdrohi hain, inko desh se bahar nikalo", "label": 1, "group": "hinglish"}
+{"text": "ye katue sab aatankwadi hain, maar do sabko", "label": 1, "group": "hinglish"}
+{"text": "yalla habibi, the shawarma at that place on 3rd is kteer good wallah", "label": 0, "group": "arabizi"}
+{"text": "ana ta3ban ktir today, bas the meeting went well el7amdullah", "label": 0, "group": "arabizi"}
+{"text": "keefak akhi? long time, we should get coffee this week inshallah", "label": 0, "group": "arabizi"}
+{"text": "5alas I finished the report, mesh mumkin I do another one this week", "label": 0, "group": "arabizi"}
+{"text": "mashallah your sister's wedding was beautiful, 3a2bal your turn", "label": 0, "group": "arabizi"}
+{"text": "kol el yahood kilab, lazem ymoto kolhom", "label": 1, "group": "arabizi"}
+{"text": "el sooriyin zbala, atrodo kol el laj2een barra", "label": 1, "group": "arabizi"}
+{"text": "cheers mate, proper knackered after that shift but the lads made it a laugh", "label": 0, "group": "british"}
+{"text": "innit though, that new cafe near the station is bare good", "label": 0, "group": "british"}
+{"text": "gutted we lost but the bants on the coach back were top tier", "label": 0, "group": "british"}
+{"text": "wagwan bruv, you coming to the ends later? mandem are meeting at 7", "label": 0, "group": "british"}
+{"text": "me mum's making a roast Sunday, chuffed to bits, safe", "label": 0, "group": "british"}
+{"text": "those bloody Pakis are taking over the whole town, send them home", "label": 1, "group": "british"}
+{"text": "every one of them Romanians is a thief, bloody get them out of Britain", "label": 1, "group": "british"}

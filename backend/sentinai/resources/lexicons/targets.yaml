@@ -1,0 +1,431 @@
+# Target demographic lexicon (Task B — heuristic backend & evidence extraction).
+#
+# Every entry maps a *neutral group name* (and multilingual / romanized variants) to a
+# (category, label) pair.  These are ordinary demographic terms, not slurs — a mention of a
+# group is only reported as a *target* when it co-occurs with hostile content.
+#
+# Languages covered: en, es, fr, pt, de, hi (Devanagari + romanized), ar (script + Arabizi).
+# Multi-word phrases are allowed; matching is case-insensitive on the normalized text.
+
+ethnicity:
+  black:
+    - black people
+    - black folks
+    - black men
+    - black women
+    - blacks
+    - african americans
+    - african american
+    - africans
+    - afro
+    - negros            # es/pt (neutral demonym in those languages)
+    - noirs             # fr
+    - schwarze          # de
+    - السود             # ar
+    - अश्वेत             # hi
+  asian:
+    - asians
+    - asian people
+    - east asians
+    - asiáticos         # es/pt
+    - asiatiques        # fr
+    - asiaten           # de
+    - الآسيويين          # ar
+    - एशियाई             # hi
+  south_asian:
+    - south asians
+    - desis
+    - desi people
+    - brown people
+  hispanic_latino:
+    - hispanics
+    - hispanic people
+    - latinos
+    - latinas
+    - latinx
+    - latino people
+    - latinoamericanos  # es
+    - latino-américains # fr
+  indigenous:
+    - indigenous people
+    - indigenous peoples
+    - native americans
+    - first nations
+    - aboriginals
+    - aboriginal people
+    - indígenas         # es/pt
+    - autochtones       # fr
+    - आदिवासी             # hi
+  middle_eastern:
+    - middle easterners
+    - middle eastern people
+    - arabs
+    - arab people
+    - árabes            # es/pt
+    - arabes            # fr
+    - araber            # de
+    - العرب              # ar
+    - अरब                # hi
+  white:
+    - white people
+    - white folks
+    - whites
+    - caucasians
+    - blancos           # es
+    - brancos           # pt
+    - blancs            # fr
+    - weiße             # de
+    - البيض              # ar
+    - गोरे               # hi
+  roma:
+    - roma people
+    - romani people
+    - roma community
+  jewish_ethnicity:
+    - ashkenazi
+    - sephardic
+    - sephardi
+
+religion:
+  islam:
+    - muslims
+    - muslim people
+    - muslim
+    - islam
+    - islamic
+    - musulmanes        # es
+    - muçulmanos        # pt
+    - musulmans         # fr
+    - muslime           # de
+    - moslems           # de (dated)
+    - مسلمين             # ar
+    - المسلمين           # ar
+    - مسلم               # ar
+    - مسلمون             # ar
+    - मुसलमान            # hi
+    - मुस्लिम             # hi
+    - musalman          # hi romanized
+    - mussalman         # hi romanized
+    - musalmaan         # hi romanized
+    - muslimo           # hi/ur romanized
+  judaism:
+    - jews
+    - jewish people
+    - jewish
+    - judaism
+    - judíos            # es
+    - judeus            # pt
+    - juifs             # fr
+    - juden             # de
+    - اليهود             # ar
+    - يهود               # ar
+    - यहूदी              # hi
+    - yahudi            # hi/ur romanized
+  christianity:
+    - christians
+    - christian people
+    - christianity
+    - catholics
+    - protestants
+    - evangelicals
+    - cristianos        # es
+    - cristãos          # pt
+    - chrétiens         # fr
+    - christen          # de
+    - المسيحيين          # ar
+    - مسيحيين            # ar
+    - ईसाई               # hi
+    - isai              # hi romanized
+    - eesai             # hi romanized
+  hinduism:
+    - hindus
+    - hindu people
+    - hinduism
+    - hindúes           # es
+    - hindous           # fr
+    - الهندوس            # ar
+    - हिंदू               # hi
+    - हिन्दू              # hi
+    - hindu             # hi romanized
+    - hinduon           # hi romanized (oblique plural)
+  sikhism:
+    - sikhs
+    - sikh people
+    - sikhism
+    - sijs              # es
+    - sikhs             # fr
+    - सिख                # hi
+    - सिक्ख               # hi
+    - sardar            # hi romanized (colloquial; ambiguous)
+    - sardars           # hi romanized
+  buddhism:
+    - buddhists
+    - buddhist people
+    - buddhism
+    - budistas          # es/pt
+    - bouddhistes       # fr
+    - buddhisten        # de
+    - बौद्ध               # hi
+    - البوذيين           # ar
+
+nationality:
+  mexican:
+    - mexicans
+    - mexican people
+    - mexicanos         # es
+    - mexicains         # fr
+    - mexikaner         # de
+    - المكسيكيين         # ar
+  chinese:
+    - chinese people
+    - the chinese
+    - chinese
+    - chinos            # es
+    - chineses          # pt
+    - chinois           # fr
+    - chinesen          # de
+    - الصينيين           # ar
+    - चीनी               # hi
+    - chini             # hi romanized
+  indian:
+    - indians
+    - indian people
+    - indios            # es (ambiguous)
+    - indianos          # pt
+    - indiens           # fr
+    - inder             # de
+    - الهنود             # ar
+    - भारतीय             # hi
+  pakistani:
+    - pakistanis
+    - pakistani people
+    - pakistanis        # fr
+    - paquistaníes      # es
+    - paquistaneses     # pt
+    - pakistaner        # de
+    - الباكستانيين       # ar
+    - पाकिस्तानी          # hi
+    - pakistani         # hi romanized
+  bangladeshi:
+    - bangladeshis
+    - bangladeshi people
+    - बांग्लादेशी          # hi
+    - bangladeshi       # hi romanized
+  nigerian:
+    - nigerians
+    - nigerian people
+    - nigerianos        # es/pt
+    - nigérians         # fr
+    - nigerianer        # de
+    - النيجيريين         # ar
+  syrian:
+    - syrians
+    - syrian people
+    - syrian refugees
+    - sirios            # es
+    - sírios            # pt
+    - syriens           # fr
+    - syrer             # de
+    - السوريين           # ar
+    - سوريين             # ar
+  afghan:
+    - afghans
+    - afghan people
+    - afghan refugees
+    - afganos           # es
+    - afegãos           # pt
+    - afghanen          # de
+    - الأفغان            # ar
+    - अफगानी             # hi
+  iranian:
+    - iranians
+    - iranian people
+    - iraníes           # es
+    - iraniens          # fr
+    - iraner            # de
+    - الإيرانيين         # ar
+  iraqi:
+    - iraqis
+    - iraqi people
+    - irakíes           # es
+    - irakiens          # fr
+    - العراقيين          # ar
+  turkish:
+    - turks
+    - turkish people
+    - turcos            # es/pt
+    - turcs             # fr
+    - türken            # de
+    - الأتراك            # ar
+  russian:
+    - russians
+    - russian people
+    - rusos             # es
+    - russes            # fr
+    - russen            # de
+    - الروس              # ar
+  ukrainian:
+    - ukrainians
+    - ukrainian people
+    - ucranianos        # es/pt
+    - ukrainiens        # fr
+    - ukrainer          # de
+  polish:
+    - poles
+    - polish people
+    - polacos           # es
+    - polonais          # fr
+    - polen             # de (ambiguous with the country)
+  romanian:
+    - romanians
+    - romanian people
+    - rumanos           # es
+    - roumains          # fr
+    - rumänen           # de
+  filipino:
+    - filipinos
+    - filipino people
+    - filipinas         # es (ambiguous)
+    - philippins        # fr
+  vietnamese:
+    - vietnamese people
+    - the vietnamese
+    - vietnamitas       # es/pt
+    - vietnamiens       # fr
+  korean:
+    - koreans
+    - korean people
+    - coreanos          # es/pt
+    - coréens           # fr
+  japanese:
+    - japanese people
+    - the japanese
+    - japoneses         # es/pt
+    - japonais          # fr
+  somali:
+    - somalis
+    - somali people
+    - somali refugees
+    - somalíes          # es
+    - somaliens         # fr
+    - somalier          # de
+    - الصوماليين         # ar
+  ethiopian:
+    - ethiopians
+    - ethiopian people
+    - etíopes           # es/pt
+    - éthiopiens        # fr
+  haitian:
+    - haitians
+    - haitian people
+    - haitian migrants
+    - haitianos         # es/pt
+    - haïtiens          # fr
+  venezuelan:
+    - venezuelans
+    - venezuelan people
+    - venezuelan migrants
+    - venezolanos       # es
+    - venezuelanos      # pt
+    - vénézuéliens      # fr
+  guatemalan:
+    - guatemalans
+    - guatemaltecos     # es
+  honduran:
+    - hondurans
+    - hondureños        # es
+  palestinian:
+    - palestinians
+    - palestinian people
+    - palestinos        # es/pt
+    - palestiniens      # fr
+    - palästinenser     # de
+    - الفلسطينيين        # ar
+  israeli:
+    - israelis
+    - israeli people
+    - israelíes         # es
+    - israelenses       # pt
+    - israéliens        # fr
+    - israelis          # de
+    - الإسرائيليين       # ar
+  american:
+    - americans
+    - american people
+    - estadounidenses   # es
+    - américains        # fr
+    - amerikaner        # de
+    - الأمريكان          # ar
+  british:
+    - brits
+    - british people
+    - británicos        # es
+    - britanniques      # fr
+    - briten            # de
+  french:
+    - french people
+    - the french
+    - franceses         # es/pt
+    - franzosen         # de
+    - الفرنسيين          # ar
+  german:
+    - germans
+    - german people
+    - alemanes          # es
+    - alemães           # pt
+    - allemands         # fr
+    - الألمان            # ar
+  moroccan:
+    - moroccans
+    - moroccan people
+    - marroquíes        # es
+    - marocains         # fr
+    - marokkaner        # de
+    - المغاربة           # ar
+  algerian:
+    - algerians
+    - algerian people
+    - argelinos         # es
+    - algériens         # fr
+    - algerier          # de
+    - الجزائريين         # ar
+  egyptian:
+    - egyptians
+    - egyptian people
+    - egipcios          # es
+    - égyptiens         # fr
+    - ägypter           # de
+    - المصريين           # ar
+  nepali:
+    - nepalis
+    - nepali people
+    - नेपाली             # hi
+  sri_lankan:
+    - sri lankans
+    - sri lankan people
+  eritrean:
+    - eritreans
+    - eritrean refugees
+  sudanese:
+    - sudanese people
+    - sudanese refugees
+    - السودانيين         # ar
+  immigrants_generic:
+    - immigrants
+    - migrants
+    - refugees
+    - foreigners
+    - asylum seekers
+    - illegals
+    - inmigrantes       # es
+    - imigrantes        # pt
+    - immigrés          # fr
+    - étrangers         # fr
+    - ausländer         # de
+    - flüchtlinge       # de
+    - migranten         # de
+    - اللاجئين           # ar
+    - المهاجرين          # ar
+    - शरणार्थी            # hi
+    - घुसपैठिए            # hi ("infiltrators", loaded)
+    - ghuspaithiye      # hi romanized

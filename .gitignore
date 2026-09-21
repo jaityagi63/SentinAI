@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+*.egg
+
+# Runtime data (SQLite DB, raw-store JSONL, retrain batches, reports)
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Model artefacts (download at runtime; see README "Optional model stacks")
+models/
+*.bin
+*.safetensors
+*.onnx
+*.pt
+lid.176.*
